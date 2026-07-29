@@ -1,0 +1,2682 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Mira — Template: Aula de Capítulo</title>
+    <script src="assets/vendor/tailwind.js"></script>
+    <link href="assets/vendor/aos.css" rel="stylesheet">
+    <script src="assets/vendor/aos.js"></script>
+    <script src="assets/vendor/lucide.js"></script>
+    <script src="assets/vendor/d3.v7.min.js"></script>
+    <link href="assets/vendor/inter.css" rel="stylesheet">
+    <style>
+        /* @MIRA:THEME:START */
+/* MIRA THEME: corporate-blue
+   Azul profundo e ciano — pitch para empresas, bancos, governo. */
+:root {
+    --mira-primary: #4DA3FF;
+    --mira-crop: #35D07F;
+    --mira-bg: #0A1220;
+    --mira-text: #ffffff;
+    --mira-text-soft: rgba(255, 255, 255, 0.72);
+    --mira-text-softer: rgba(255, 255, 255, 0.50);
+    --mira-card-bg: rgba(255, 255, 255, 0.05);
+    --mira-card-border: rgba(255, 255, 255, 0.10);
+    --mira-glow-soft: rgba(77, 163, 255, 0.15);
+    --mira-glow-strong: rgba(77, 163, 255, 0.25);
+    --mira-icon-bg: rgba(77, 163, 255, 0.15);
+    --mira-icon-border: rgba(77, 163, 255, 0.30);
+    --mira-pill-bg: rgba(255, 255, 255, 0.04);
+    --mira-pill-border: rgba(255, 255, 255, 0.08);
+    --mira-stage-glow: rgba(77, 163, 255, 0.06);
+    --mira-accent-2: #6EE7F0;
+}
+
+
+/* ============================================================
+   MIRA — base.css
+   Estrutura compartilhada por todos os temas.
+   Os temas definem apenas as CSS variables (--mira-*).
+   ============================================================ */
+
+body {
+    background: var(--mira-bg);
+    min-height: 100vh;
+    color: var(--mira-text);
+    font-family: 'Inter', sans-serif;
+}
+
+.primary-color { color: var(--mira-primary); }
+.primary-bg { background: var(--mira-primary); }
+
+.glass-card {
+    background: var(--mira-card-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--mira-card-border);
+    box-shadow: 0 10px 30px var(--mira-glow-soft);
+    transition: all 0.3s ease;
+    border-radius: 0.75rem;
+}
+
+.glass-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px var(--mira-glow-strong);
+}
+
+.icon-hero {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    background: var(--mira-icon-bg);
+    border: 1px solid var(--mira-icon-border);
+}
+
+.attribute-pill {
+    background: var(--mira-pill-bg);
+    border: 1px solid var(--mira-pill-border);
+    transition: all 0.25s ease;
+    border-radius: 9999px;
+}
+
+.attribute-pill:hover {
+    background: var(--mira-icon-bg);
+    border-color: var(--mira-icon-border);
+    transform: translateY(-3px);
+}
+
+/* Palco de animação D3 — tamanho padrão do canvas */
+.anim-stage {
+    width: 100%;
+    height: clamp(400px, 60vh, 620px);
+    background: radial-gradient(circle at 50% 50%, var(--mira-stage-glow), transparent 70%);
+    border-radius: 8px;
+    overflow: hidden;
+    position: relative;
+}
+
+.anim-stage svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+.replay-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    background: var(--mira-pill-bg);
+    border: 1px solid var(--mira-pill-border);
+    color: var(--mira-text-soft);
+    border-radius: 9999px;
+    padding: 6px 14px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+
+.replay-btn:hover {
+    background: var(--mira-icon-bg);
+    color: var(--mira-primary);
+}
+
+.text-soft { color: var(--mira-text-soft); }
+.text-softer { color: var(--mira-text-softer); }
+
+@keyframes mira-pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.08); opacity: 0.85; }
+}
+
+@keyframes mira-float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes mira-gradient-shift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* @MIRA:THEME:END */
+
+        /* Diretriz de titulo da capa (CLAUDE.md): quebra equilibrada so no primeiro slide */
+        body > section:first-of-type h1,
+        body > section:first-of-type h2 { text-wrap: balance; }
+
+        /* Palco do slide "autocomplete gigante" */
+        #autocomplete-stage { height: clamp(400px, 60vh, 620px); }
+        #autocomplete-stage + .border-t {
+            padding-top: 0.25rem;
+            margin-top: 0.25rem;
+            margin-bottom: 0.25rem;
+        }
+
+        /* === CONTROLES DE SLIDE (passagem card-a-card) === */
+        html { scroll-behavior: smooth; }
+        /* Scroll discreto (padrao Mira): a navegacao e por teclado/botao e o
+           progresso ja aparece na barra do topo; a scrollbar fica quase invisivel. */
+        html { scrollbar-width: thin; scrollbar-color: #2e2e2e #0d0d0d; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; background: #0d0d0d; }
+        ::-webkit-scrollbar-track { background: #0d0d0d; }
+        ::-webkit-scrollbar-thumb { background: #2e2e2e; border-radius: 999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #4a4a4a; }
+        ::-webkit-scrollbar-button { display: none; width: 0; height: 0; }
+
+        #mira-progress {
+            position: fixed; top: 0; left: 0; height: 3px; width: 0%;
+            background: linear-gradient(90deg, var(--mira-primary), var(--mira-accent-2), var(--mira-primary));
+            background-size: 200% 100%;
+            animation: mira-shimmer 2s linear infinite;
+            z-index: 9999; transition: width 0.1s linear;
+            box-shadow: 0 0 10px var(--mira-glow-strong);
+        }
+
+        @keyframes mira-shimmer {
+            0% { background-position: -200% center; }
+            100% { background-position: 200% center; }
+        }
+
+        #mira-next {
+            position: fixed; bottom: 32px; right: 32px;
+            width: 48px; height: 48px; border-radius: 50%;
+            background: var(--mira-primary); color: var(--mira-bg);
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; border: none;
+            opacity: 0; transform: translateY(20px);
+            transition: all 0.3s ease; z-index: 9998;
+            box-shadow: 0 4px 20px var(--mira-glow-strong);
+        }
+        #mira-next.visible { opacity: 1; transform: translateY(0); }
+        #mira-next:hover { transform: translateY(-3px) scale(1.1); }
+    
+/* @MIRA:RESPONSIVE:START */
+/* ============================================================
+   MIRA — responsive.css  (camada de reflow mobile-first)
+   Objetivo: TODO slide 16:9 do Mira vira legível no celular em
+   retrato SEM arquivo mobile separado. O mesmo deck se reorganiza:
+   fontes encolhem, grids empilham, padding reduz, palcos escalam.
+
+   Estratégia: os decks nascem "desktop-first" (classes Tailwind com
+   tamanhos fixos: text-6xl, p-10, ...). Esta camada sobrescreve essas
+   classes abaixo de 640px. Usa !important de propósito — precisa
+   vencer o Tailwind CDN (injetado em runtime) em decks legados sem
+   reescrever o HTML. Os clamps têm teto ~= valor desktop, então em
+   telas largas nada muda; só encolhem no estreito.
+   ============================================================ */
+
+/* Guarda universal contra overflow horizontal (o "print cortado" no zap). */
+html, body { max-width: 100%; overflow-x: hidden; }
+img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
+
+@media (max-width: 640px) {
+
+  /* --- Tipografia fluida: encolhe títulos gigantes no celular --- */
+  .text-9xl { font-size: clamp(3rem, 12vw, 5rem)      !important; line-height: 1.05 !important; }
+  .text-8xl { font-size: clamp(2.75rem, 11vw, 4.5rem) !important; line-height: 1.06 !important; }
+  .text-7xl { font-size: clamp(2.25rem, 10vw, 3.75rem)!important; line-height: 1.08 !important; }
+  .text-6xl { font-size: clamp(2rem, 9vw, 3rem)       !important; line-height: 1.1  !important; }
+  .text-5xl { font-size: clamp(1.75rem, 8vw, 2.5rem)  !important; line-height: 1.12 !important; }
+  .text-4xl { font-size: clamp(1.5rem, 7vw, 2rem)     !important; line-height: 1.15 !important; }
+  .text-3xl { font-size: clamp(1.35rem, 6vw, 1.75rem) !important; line-height: 1.2  !important; }
+  .text-2xl { font-size: clamp(1.2rem, 5vw, 1.5rem)   !important; line-height: 1.25 !important; }
+  .text-xl  { font-size: clamp(1.05rem, 4.5vw, 1.25rem)!important; line-height: 1.3 !important; }
+
+  /* Títulos: quebram entre palavras; só partem uma palavra se ela sozinha
+     estourar a largura. Sem hyphens:auto — em PT ele hifena no meio
+     ("pode-rosas") e fica feio em título de display. */
+  h1, h2, h3 { overflow-wrap: break-word; }
+
+  /* --- Espaçamento: paddings de desktop sufocam o celular --- */
+  .p-12 { padding: 1.25rem !important; }
+  .p-10 { padding: 1.15rem !important; }
+  .p-8  { padding: 1.05rem !important; }
+  .px-12, .px-10 { padding-left: 1.15rem !important; padding-right: 1.15rem !important; }
+  .px-8 { padding-left: 1rem !important; padding-right: 1rem !important; }
+  .py-16 { padding-top: 2.5rem !important; padding-bottom: 2.5rem !important; }
+  .gap-8 { gap: 1rem !important; }
+  .gap-10, .gap-12 { gap: 1.25rem !important; }
+
+  /* --- Layout: seção de slide sempre alcançável pelo topo ---
+     min-h-screen + justify-center clipa o topo quando o conteúdo é
+     maior que a tela. No celular, ancora no topo e deixa rolar. */
+  .min-h-screen {
+    min-height: 100dvh !important;
+    height: auto !important;
+    padding-top: 2rem !important;
+    padding-bottom: 2rem !important;
+  }
+  .min-h-screen.justify-center,
+  .min-h-screen.items-center { justify-content: flex-start !important; }
+
+  /* --- Grids/flex de 2+ colunas empilham (redundante ao md: do
+         Tailwind, mas cobre grids sem breakpoint declarado). --- */
+  .grid-cols-2, .grid-cols-3, .grid-cols-4 { grid-template-columns: 1fr !important; }
+
+  /* --- Palco de animação (D3/SVG/canvas): nunca estoura a largura,
+         mantém proporção e encolhe a altura. --- */
+  .anim-stage {
+    max-width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16 / 9;
+    min-height: 0 !important;
+  }
+
+  /* --- Tabelas: fonte menor + rolagem horizontal se precisar. --- */
+  table { font-size: 0.82rem !important; }
+  .overflow-x-auto { -webkit-overflow-scrolling: touch; }
+
+  /* --- Controles flutuantes respeitam a safe-area do iPhone. --- */
+  #mira-next, #next-card {
+    bottom: max(1rem, env(safe-area-inset-bottom)) !important;
+    right: max(1rem, env(safe-area-inset-right)) !important;
+    width: 44px !important; height: 44px !important;
+  }
+}
+/* @MIRA:RESPONSIVE:END */
+</style>
+</head>
+
+<body>
+    <!-- Controles de slide: barra de progresso + botão flutuante "próximo" -->
+    <div id="mira-progress"></div>
+    <button id="mira-next" aria-label="Próximo slide">
+        <i data-lucide="chevron-down" class="w-6 h-6" id="mira-next-icon"></i>
+    </button>
+
+    <!-- ============ SLIDE 1: CAPA ============ -->
+    <section class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-6">
+        <div id="capa-stage" class="absolute inset-0 pointer-events-none"></div>
+        <div class="relative z-10 text-center max-w-4xl" data-aos="fade-up">
+            <p class="attribute-pill inline-block px-5 py-2 text-sm tracking-widest uppercase text-soft mb-8">Fundamentos · LLMs e Agentes</p>
+            <h1 class="text-6xl md:text-7xl font-black leading-tight mb-6">
+                LLMs e Agentes de IA<br>
+                <span class="primary-color">como funcionam</span>
+            </h1>
+            <p class="text-xl text-soft max-w-2xl mx-auto mb-10">Da previsão da próxima palavra até a ação no mundo real: o motor por trás dos agentes.</p>
+            <div class="flex items-center justify-center gap-3 text-softer text-sm">
+                <i data-lucide="user" class="w-4 h-4 primary-color"></i> Lauro Ramon
+                <span class="opacity-40">|</span>
+                <i data-lucide="calendar" class="w-4 h-4 primary-color"></i> 2026
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ SLIDE 2: COMO UMA REDE NEURAL PENSA ============ -->
+    <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
+        <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
+            <div class="text-center mb-2">
+                <h2 class="text-4xl md:text-5xl font-bold mb-2">
+                    Como uma <span class="primary-color italic">rede neural</span> pensa
+                </h2>
+                <p class="text-white/60 italic text-lg md:text-xl">Um sinal de entrada acende neurônios até virar uma saída.</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-1 md:p-2">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-[#4DA3FF]/15 flex items-center justify-center">
+                            <i data-lucide="network" class="w-5 h-5 primary-color"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-bold text-sm">Propagação do sinal</p>
+                            <p class="text-white/50 text-xs italic">Cada neurônio acende conforme o peso da conexão.</p>
+                        </div>
+                    </div>
+                    <button id="replay-neural" class="replay-btn" type="button">
+                        <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                        Replay
+                    </button>
+                </div>
+
+                <!-- @MIRA:SIZE 3/10 -->
+                <div class="anim-stage" id="neural-stage">
+                    <svg id="neural-svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+
+                <div class="border-t border-white/10 pt-1 mt-1 mb-1">
+                    <p class="text-xs uppercase tracking-[3px] text-white/40 text-center mb-1">Passo a passo do sinal</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="log-in" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Entrada</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="sliders" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Pesos</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="zap" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Ativação</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="log-out" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Saída</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ SLIDE 3: TOKENIZAÇÃO ============ -->
+    <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
+        <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
+            <div class="text-center mb-2">
+                <h2 class="text-4xl md:text-5xl font-bold mb-2">
+                    Como o texto vira <span class="primary-color italic">tokens</span>
+                </h2>
+                <p class="text-white/60 italic text-lg md:text-xl">O prompt é fatiado em pedaços antes de entrar na rede.</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-1 md:p-2">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-[#4DA3FF]/15 flex items-center justify-center">
+                            <i data-lucide="scissors" class="w-5 h-5 primary-color"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-bold text-sm">Tokenização</p>
+                            <p class="text-white/50 text-xs italic">Cada pedaço vira um token numérico.</p>
+                        </div>
+                    </div>
+                    <button id="replay-token" class="replay-btn" type="button">
+                        <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                        Replay
+                    </button>
+                </div>
+
+                <!-- @MIRA:SIZE 3/10 -->
+                <div class="anim-stage" id="token-stage">
+                    <svg id="token-svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+
+                <div class="border-t border-white/10 pt-1 mt-1 mb-1">
+                    <p class="text-xs uppercase tracking-[3px] text-white/40 text-center mb-1">Do prompt ao token</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="message-square" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Prompt</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="scissors" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Fatiar</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="hash" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Token</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="network" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Rede neural</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ SLIDE 4: LLM É UM AUTOCOMPLETE ============ -->
+    <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
+        <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
+            <div class="text-center mb-2">
+                <h2 class="text-4xl md:text-5xl font-bold mb-2">
+                    Uma LLM é um <span class="primary-color italic">autocomplete</span> gigante
+                </h2>
+                <p class="text-white/60 italic text-lg md:text-xl">Ela só prevê a palavra mais provável depois do seu texto.</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-1 md:p-2">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-[#4DA3FF]/15 flex items-center justify-center">
+                            <i data-lucide="text-cursor-input" class="w-5 h-5 primary-color"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-bold text-sm">Previsão da próxima palavra</p>
+                            <p class="text-white/50 text-xs italic">A rede pontua cada candidato e devolve o mais provável.</p>
+                        </div>
+                    </div>
+                    <button id="replay-autocomplete" class="replay-btn" type="button">
+                        <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                        Replay
+                    </button>
+                </div>
+
+                <!-- @MIRA:SIZE 3/10 -->
+                <div class="anim-stage" id="autocomplete-stage">
+                    <svg id="autocomplete-svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+
+                <div class="border-t border-white/10 pt-1 mt-1 mb-1">
+                    <p class="text-xs uppercase tracking-[3px] text-white/40 text-center mb-1">O jogo é prever a próxima palavra</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="message-square" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Seu texto</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="hash" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Tokens</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="bar-chart-3" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Probabilidades</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="sparkles" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Próxima palavra</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ SLIDE 5: JANELA DE CONTEXTO ============ -->
+    <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
+        <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
+            <div class="text-center mb-2">
+                <h2 class="text-4xl md:text-5xl font-bold mb-2">
+                    Como a <span class="primary-color italic">janela de contexto</span> enche
+                </h2>
+                <p class="text-white/60 italic text-lg md:text-xl">Quando lota, o agente resume o antigo e descarta o resto.</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-1 md:p-2">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-[#4DA3FF]/15 flex items-center justify-center">
+                            <i data-lucide="layers" class="w-5 h-5 primary-color"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-bold text-sm">Ocupação da sessão</p>
+                            <p class="text-white/50 text-xs italic">Cada bloco é um trecho da conversa ocupando espaço.</p>
+                        </div>
+                    </div>
+                    <button id="replay-ctx" class="replay-btn" type="button">
+                        <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                        Replay
+                    </button>
+                </div>
+
+                <!-- @MIRA:SIZE 3/10 -->
+                <div class="anim-stage" id="ctx-stage">
+                    <svg id="ctx-svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+
+                <div class="border-t border-white/10 pt-1 mt-1 mb-1">
+                    <p class="text-xs uppercase tracking-[3px] text-white/40 text-center mb-1">O ciclo de vida do contexto</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="plus-square" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Tokens entram</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="gauge" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">A janela lota</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="fold-vertical" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Resumo comprime</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="trash-2" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Antigos descartados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ SLIDE 6: COMANDO OBJETIVO (A IA NÃO TEM CONSCIÊNCIA) ============ -->
+    <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
+        <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
+            <div class="text-center mb-2">
+                <h2 class="text-4xl md:text-5xl font-bold mb-2">
+                    A IA não <span class="primary-color italic">pergunta</span>, ela executa
+                </h2>
+                <p class="text-white/60 italic text-lg md:text-xl">Sem consciência e longe da AGI: quem dá a medida é você.</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-1 md:p-2">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-[#4DA3FF]/15 flex items-center justify-center">
+                            <i data-lucide="ruler" class="w-5 h-5 primary-color"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-bold text-sm">Pedido na bancada</p>
+                            <p class="text-white/50 text-xs italic">Sem cotas no papel, o corte sai no chute.</p>
+                        </div>
+                    </div>
+                    <button id="replay-corte" class="replay-btn" type="button">
+                        <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                        Replay
+                    </button>
+                </div>
+
+                <!-- @MIRA:SIZE 3/10 -->
+                <div class="anim-stage" id="corte-stage">
+                    <svg id="corte-svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+
+                <div class="border-t border-white/10 pt-1 mt-1 mb-1">
+                    <p class="text-xs uppercase tracking-[3px] text-white/40 text-center mb-1">Não é AGI: é execução literal</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="message-square" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Pedido vago</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="target" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Objetivo explícito</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="ruler" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Contexto suficiente</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="check" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Acerto de primeira</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ SLIDE 7: ORÇAMENTO DA MENSAGEM (CORTESIA NÃO PONTUA) ============ -->
+    <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
+        <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
+            <div class="text-center mb-2">
+                <h2 class="text-4xl md:text-5xl font-bold mb-2">
+                    Gaste tokens com <span class="primary-color italic">instrução</span>, não cortesia
+                </h2>
+                <p class="text-white/60 italic text-lg md:text-xl">Ela não sente gratidão: "por favor" só ocupa a janela.</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-1 md:p-2">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-[#4DA3FF]/15 flex items-center justify-center">
+                            <i data-lucide="coins" class="w-5 h-5 primary-color"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-bold text-sm">Orçamento da mensagem</p>
+                            <p class="text-white/50 text-xs italic">Cada palavra é uma ficha gasta na máquina.</p>
+                        </div>
+                    </div>
+                    <button id="replay-fichas" class="replay-btn" type="button">
+                        <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                        Replay
+                    </button>
+                </div>
+
+                <!-- @MIRA:SIZE 3/10 -->
+                <div class="anim-stage" id="fichas-stage">
+                    <svg id="fichas-svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+
+                <div class="border-t border-white/10 pt-1 mt-1 mb-1">
+                    <p class="text-xs uppercase tracking-[3px] text-white/40 text-center mb-1">O que ocupa a janela precisa trabalhar</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="brain" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Sem consciência</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="x" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Cortesia não pontua</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="coins" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Token é finito</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="list-checks" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Formato e restrição</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ SLIDE 8: ANATOMIA DE UM AGENTE (MODELO + HARNESS) ============ -->
+    <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
+        <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
+            <div class="text-center mb-2">
+                <h2 class="text-4xl md:text-5xl font-bold mb-2">
+                    Agente é modelo mais <span class="primary-color italic">harness</span>
+                </h2>
+                <p class="text-white/60 italic text-lg md:text-xl">O modelo entende o pedido; o harness age na sua máquina.</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-1 md:p-2">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-[#4DA3FF]/15 flex items-center justify-center">
+                            <i data-lucide="cpu" class="w-5 h-5 primary-color"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-bold text-sm">Anatomia de um agente de IA</p>
+                            <p class="text-white/50 text-xs italic">O harness já sabe sozinho o que precisa acionar.</p>
+                        </div>
+                    </div>
+                    <button id="replay-agente" class="replay-btn" type="button">
+                        <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                        Replay
+                    </button>
+                </div>
+
+                <!-- @MIRA:SIZE 3/10 -->
+                <div class="anim-stage" id="agente-stage">
+                    <svg id="agente-svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+
+                <div class="border-t border-white/10 pt-1 mt-1 mb-1">
+                    <p class="text-xs uppercase tracking-[3px] text-white/40 text-center mb-1">Duas peças, uma capacidade</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="brain-circuit" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Modelo raciocina</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="wrench" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Harness executa</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="terminal" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Ferramentas reais</p>
+                        </div>
+                        <div class="attribute-pill text-center p-1 rounded-xl">
+                            <i data-lucide="route" class="w-4 h-4 primary-color mx-auto mb-1"></i>
+                            <p class="text-sm font-semibold tracking-wide">Escolha automática</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ SLIDE 9: ENCERRAMENTO ============ -->
+    <section class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-6">
+        <div class="cta-breathe absolute inset-0 pointer-events-none"></div>
+        <div class="relative z-10 text-center max-w-4xl" data-aos="zoom-in">
+            <div class="icon-hero mx-auto mb-8" style="width:72px;height:72px;border-radius:20px;">
+                <i data-lucide="rocket" class="primary-color w-9 h-9"></i>
+            </div>
+            <h2 class="text-5xl md:text-6xl font-black mb-6">
+                O que fica desta <span class="primary-color">conversa</span>
+            </h2>
+            <p class="text-2xl md:text-3xl text-white/90 leading-snug mb-10 max-w-3xl mx-auto">
+                A LLM fatia seu texto em tokens e prevê o próximo pedaço dentro de uma janela de contexto.
+                O harness é o que transforma essa previsão em ação: ele aciona terminal, arquivos e web.
+                Modelo mais harness é o agente; a medida do pedido continua sendo sua.
+            </p>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-12 text-left">
+                <div class="attribute-pill p-4 rounded-xl">
+                    <i data-lucide="scissors" class="w-5 h-5 primary-color mb-2"></i>
+                    <p class="text-base font-semibold">Token</p>
+                    <p class="text-softer text-sm">Seu texto vira pedaços numéricos.</p>
+                </div>
+                <div class="attribute-pill p-4 rounded-xl">
+                    <i data-lucide="dice-5" class="w-5 h-5 primary-color mb-2"></i>
+                    <p class="text-base font-semibold">Previsão</p>
+                    <p class="text-softer text-sm">A LLM só escolhe o próximo token provável.</p>
+                </div>
+                <div class="attribute-pill p-4 rounded-xl">
+                    <i data-lucide="wrench" class="w-5 h-5 primary-color mb-2"></i>
+                    <p class="text-base font-semibold">Harness</p>
+                    <p class="text-softer text-sm">É ele que executa no mundo real.</p>
+                </div>
+                <div class="attribute-pill p-4 rounded-xl">
+                    <i data-lucide="user-check" class="w-5 h-5 primary-color mb-2"></i>
+                    <p class="text-base font-semibold">Você</p>
+                    <p class="text-softer text-sm">Sem consciência do outro lado: o critério é seu.</p>
+                </div>
+            </div>
+            <p class="text-2xl font-bold mb-1">Obrigado pela <span class="primary-color">presença</span></p>
+            <p class="text-lg text-soft">Bons prompts e bom código. Perguntas?</p>
+            <p class="text-softer mt-10 text-sm tracking-widest uppercase">Lauro Ramon · Feito com Mira</p>
+        </div>
+        <style>
+            .cta-breathe {
+                background: radial-gradient(ellipse at 50% 60%, var(--mira-glow-strong), transparent 65%);
+                animation: mira-pulse 4s ease-in-out infinite;
+            }
+        </style>
+    </section>
+
+    <script>
+        AOS.init({ duration: 800, once: true });
+        lucide.createIcons();
+
+        const cssVar = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+        const PRIMARY = cssVar('--mira-primary');
+
+        // ===== CAPA: o texto sendo gerado token a token, com a probabilidade de cada candidato =====
+        // Literal, sem analogia: a cada passo aparecem os candidatos com a probabilidade,
+        // o mais provável é escolhido, desce e entra na frase. Ao terminar, recomeça.
+        (function () {
+            const palco = document.getElementById('capa-stage');
+
+            // remontada completa: o viewBox tem que casar com a caixa real do palco,
+            // senão o desenho escala e desalinha quando a altura da tela muda
+            function montar() {
+            const box = palco.getBoundingClientRect();
+            const W = Math.round(box.width) || window.innerWidth;
+            const H = Math.round(box.height) || window.innerHeight;
+            d3.select(palco).selectAll('svg').remove();
+            // fundo discreto: a capa é do título, a animação só acompanha
+            const svg = d3.select(palco).append('svg')
+                .attr('viewBox', `0 0 ${W} ${H}`).attr('opacity', 0.34);
+
+            const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
+            const FS = Math.max(13, Math.min(20, W * 0.0134));
+            const LINE_Y = H - 48;
+            // candidatos lado a lado, nao empilhados: ocupa menos altura e nao encosta no autor
+            const CHIP_W = 96, CHIP_H = 18, CHIP_GAP = 8;
+            const FAIXA_W = 3 * CHIP_W + 2 * CHIP_GAP;
+            const ROW_Y = LINE_Y - 40;
+
+            const P_FORTE = (() => { const c = d3.color(PRIMARY); c.opacity = 0.30; return c + ''; })();
+
+            // cada passo: candidatos ordenados, o primeiro é o escolhido
+            const PASSOS = [
+                [['O', 0.58], ['Um', 0.27], ['Esse', 0.15]],
+                [['agente', 0.64], ['modelo', 0.23], ['sistema', 0.13]],
+                [['prevê', 0.55], ['escolhe', 0.31], ['gera', 0.14]],
+                [['a', 0.72], ['uma', 0.18], ['cada', 0.10]],
+                [['próxima', 0.69], ['melhor', 0.20], ['última', 0.11]],
+                [['palavra', 0.61], ['ação', 0.26], ['letra', 0.13]],
+                [['e', 0.66], ['então', 0.21], ['mas', 0.13]],
+                [['age.', 0.52], ['decide.', 0.32], ['espera.', 0.16]]
+            ];
+
+            // medicao real do texto para a frase nascer centrada e nao dancar enquanto cresce
+            const regua = svg.append('g').attr('opacity', 0);
+            function medir(txt, size) {
+                const t = regua.append('text').attr('font-family', MONO).attr('font-size', size || FS).text(txt);
+                const w = t.node().getComputedTextLength();
+                t.remove();
+                return w;
+            }
+            const larguras = PASSOS.map(p => medir(p[0][0]));
+            const ESP = Math.max(5, medir('a a') - medir('aa'));
+            let acc = 0;
+            const offsets = PASSOS.map((p, i) => { const x = acc; acc += larguras[i] + ESP; return x; });
+            const X0 = Math.max(40, (W - (acc - ESP)) / 2);
+            offsets.forEach((v, i) => offsets[i] = X0 + v);
+
+            const gLinha = svg.append('g');
+            const gPainel = svg.append('g');
+            const cursor = svg.append('rect').attr('width', 3).attr('height', FS * 1.05)
+                .attr('y', LINE_Y - FS * 0.82).attr('fill', PRIMARY).attr('x', X0);
+
+            function animarCapa() {
+                clearTimeout(window.__capaTimer);
+                clearInterval(window.__capaCursor);
+                window.__capaGen = (window.__capaGen || 0) + 1;
+                const myGen = window.__capaGen;
+
+                gLinha.selectAll('*').remove();
+                gPainel.selectAll('*').remove();
+                gLinha.attr('opacity', 1);
+                gPainel.attr('opacity', 1);
+                cursor.attr('x', X0).attr('opacity', 1);
+
+                // cursor piscando: o movimento que nunca para
+                window.__capaCursor = setInterval(() => {
+                    if (myGen !== window.__capaGen) { clearInterval(window.__capaCursor); return; }
+                    cursor.attr('opacity', +cursor.attr('opacity') ? 0 : 1);
+                }, 520);
+
+                function passo(i) {
+                    if (myGen !== window.__capaGen) return;
+
+                    if (i >= PASSOS.length) {
+                        // frase pronta: segura para leitura e recomeça
+                        window.__capaTimer = setTimeout(() => {
+                            if (myGen !== window.__capaGen) return;
+                            gLinha.transition('sai').duration(600).attr('opacity', 0);
+                            window.__capaTimer = setTimeout(() => {
+                                if (myGen === window.__capaGen) animarCapa();
+                            }, 680);
+                        }, 1700);
+                        return;
+                    }
+
+                    const cands = PASSOS[i];
+                    const penX = offsets[i];
+                    const painelX = Math.min(Math.max(penX - CHIP_W / 2, 24), W - FAIXA_W - 24);
+
+                    gPainel.selectAll('*').remove();
+                    gPainel.append('text')
+                        .attr('x', painelX).attr('y', ROW_Y - 8)
+                        .attr('font-size', 9).attr('letter-spacing', 2)
+                        .attr('fill', 'rgba(255,255,255,0.40)')
+                        .text('PRÓXIMO TOKEN');
+
+                    const linhas = cands.map((c, k) => ({ t: c[0], p: c[1], k, x: painelX + k * (CHIP_W + CHIP_GAP) }));
+                    const g = gPainel.selectAll('g.cand').data(linhas).join('g').attr('class', 'cand')
+                        .attr('transform', d => `translate(${d.x},${ROW_Y})`)
+                        .attr('opacity', 0);
+
+                    g.append('rect').attr('class', 'fundo')
+                        .attr('width', CHIP_W).attr('height', CHIP_H).attr('rx', 5)
+                        .attr('fill', 'rgba(255,255,255,0.05)');
+                    g.append('rect').attr('class', 'barra')
+                        .attr('height', CHIP_H).attr('rx', 5).attr('width', 0)
+                        .attr('fill', d => d.k === 0 ? P_FORTE : 'rgba(255,255,255,0.07)');
+                    g.append('text').attr('x', 8).attr('y', CHIP_H * 0.71)
+                        .attr('font-family', MONO).attr('font-size', 11)
+                        .attr('fill', d => d.k === 0 ? '#ffffff' : 'rgba(255,255,255,0.55)')
+                        .text(d => d.t);
+                    g.append('text').attr('x', CHIP_W - 8).attr('y', CHIP_H * 0.71)
+                        .attr('text-anchor', 'end').attr('font-size', 10)
+                        .attr('fill', d => d.k === 0 ? PRIMARY : 'rgba(255,255,255,0.35)')
+                        .text(d => Math.round(d.p * 100) + '%');
+
+                    // 1) candidatos entram e as barras crescem conforme a probabilidade
+                    g.transition('ent').delay(d => d.k * 70).duration(220).attr('opacity', 1);
+                    g.select('rect.barra').transition('barra').delay(d => 130 + d.k * 70)
+                        .duration(320).ease(d3.easeQuadOut).attr('width', d => CHIP_W * d.p);
+
+                    // 2) o mais provável se destaca, os outros recuam
+                    setTimeout(() => {
+                        if (myGen !== window.__capaGen) return;
+                        g.filter(d => d.k > 0).transition('dim').duration(260).attr('opacity', 0.32);
+                        g.filter(d => d.k === 0).select('rect.fundo').transition('win').duration(200)
+                            .attr('stroke', PRIMARY).attr('stroke-width', 2);
+                    }, 560);
+
+                    // 3) o escolhido desce e vira parte da frase
+                    setTimeout(() => {
+                        if (myGen !== window.__capaGen) return;
+                        const voo = svg.append('text')
+                            .attr('font-family', MONO).attr('font-size', 11).attr('fill', '#ffffff')
+                            .attr('x', painelX + 8).attr('y', ROW_Y + CHIP_H * 0.71)
+                            .text(cands[0][0]);
+
+                        voo.transition('voo').duration(400).ease(d3.easeQuadInOut)
+                            .attr('x', penX).attr('y', LINE_Y).attr('font-size', FS);
+
+                        // a sequência avança por tempo, nunca pelo fim da transição: com a aba
+                        // em segundo plano o navegador congela o rAF e o evento 'end' nunca chega
+                        window.__capaTimer = setTimeout(() => {
+                            voo.remove();
+                            if (myGen !== window.__capaGen) return;
+
+                            gLinha.append('text')
+                                .attr('font-family', MONO).attr('font-size', FS)
+                                .attr('x', penX).attr('y', LINE_Y)
+                                .attr('fill', 'rgba(255,255,255,0.92)')
+                                .text(cands[0][0]);
+                            cursor.attr('x', penX + larguras[i] + 6).attr('opacity', 1);
+
+                            gPainel.transition('fim').duration(200).attr('opacity', 0);
+                            window.__capaTimer = setTimeout(() => {
+                                if (myGen !== window.__capaGen) return;
+                                gPainel.selectAll('*').remove();
+                                gPainel.attr('opacity', 1);
+                                passo(i + 1);
+                            }, 280);
+                        }, 400);
+                    }, 800);
+                }
+
+                passo(0);
+            }
+
+            animarCapa();
+            }
+
+            window.__capaReplay = montar;
+            montar();
+            window.addEventListener('resize', () => {
+                clearTimeout(window.__capaResize);
+                window.__capaResize = setTimeout(montar, 250);
+            });
+        })();
+
+        // ===== REDE NEURAL: trilha única de entrada até saída (loop) =====
+        (function () {
+            const ACCENT = cssVar('--mira-accent-2');
+            const W = 1280, H = 720;
+            const svg = d3.select('#neural-svg');
+            const LAYER_SIZES = [1, 4, 4, 3, 2];
+            const LAYER_LABELS = ['Entrada', 'Oculta 1', 'Oculta 2', 'Oculta 3', 'Saída'];
+            const xs = d3.scalePoint().domain(d3.range(LAYER_SIZES.length)).range([150, W - 150]);
+
+            function yPositions(count) {
+                const top = 160, bottom = H - 200;
+                if (count === 1) return [(top + bottom) / 2];
+                const step = (bottom - top) / (count - 1);
+                return d3.range(count).map(i => top + i * step);
+            }
+
+            const layerNodes = LAYER_SIZES.map((count, li) => {
+                const ys = yPositions(count);
+                return ys.map(y => ({ layer: li, x: xs(li), y }));
+            });
+            const allNodes = layerNodes.flat();
+
+            const edges = [];
+            for (let li = 0; li < layerNodes.length - 1; li++) {
+                layerNodes[li].forEach(a => {
+                    layerNodes[li + 1].forEach(b => {
+                        edges.push({ source: a, target: b, w: Math.random() * 2 - 1 });
+                    });
+                });
+            }
+
+            const DIM_OPACITY = d => 0.08 + Math.abs(d.w) * 0.08;
+
+            const edgeSel = svg.append('g').selectAll('line').data(edges).join('line')
+                .attr('x1', d => d.source.x).attr('y1', d => d.source.y)
+                .attr('x2', d => d.source.x).attr('y2', d => d.source.y)
+                .attr('stroke', d => d.w >= 0 ? PRIMARY : ACCENT)
+                .attr('stroke-width', 1)
+                .attr('opacity', 0);
+            edgeSel.transition().delay(d => 200 + d.source.layer * 260).duration(500)
+                .attr('x2', d => d.target.x).attr('y2', d => d.target.y)
+                .attr('opacity', DIM_OPACITY);
+
+            const nodeSel = svg.append('g').selectAll('circle').data(allNodes).join('circle')
+                .attr('cx', d => d.x).attr('cy', d => d.y).attr('r', 0)
+                .attr('fill', 'rgba(255,255,255,0.06)')
+                .attr('stroke', PRIMARY).attr('stroke-width', 2).attr('stroke-opacity', 0.5);
+            nodeSel.transition().delay(d => 300 + d.layer * 260).duration(450)
+                .ease(d3.easeBackOut.overshoot(1.4)).attr('r', d => d.layer === 0 ? 20 : 14);
+
+            svg.append('g').selectAll('text').data(LAYER_LABELS).join('text')
+                .attr('x', (d, i) => xs(i)).attr('y', H - 130).attr('text-anchor', 'middle')
+                .attr('fill', 'rgba(255,255,255,0.4)').attr('font-size', 13).attr('font-weight', 700)
+                .attr('opacity', 0).text(d => d)
+                .transition().delay((d, i) => 500 + i * 260).attr('opacity', 1);
+
+            const trilha = svg.append('circle').attr('r', 8).attr('fill', '#fff')
+                .style('filter', `drop-shadow(0 0 10px ${PRIMARY})`).attr('opacity', 0);
+
+            function propagar() {
+                clearTimeout(window.__neuralTimer);
+                window.__neuralGen = (window.__neuralGen || 0) + 1;
+                const myGen = window.__neuralGen;
+
+                // reset visual para o fundo neutro da rede
+                nodeSel.interrupt().attr('fill', 'rgba(255,255,255,0.06)')
+                    .attr('r', d => d.layer === 0 ? 20 : 14);
+                edgeSel.interrupt().attr('stroke-width', 1).attr('opacity', DIM_OPACITY);
+                trilha.attr('opacity', 0);
+
+                // sorteia um único caminho: um nó por camada
+                const caminho = [layerNodes[0][0]];
+                for (let li = 1; li < layerNodes.length; li++) {
+                    const camada = layerNodes[li];
+                    caminho.push(camada[Math.floor(Math.random() * camada.length)]);
+                }
+                const trechoEdges = [];
+                for (let i = 0; i < caminho.length - 1; i++) {
+                    trechoEdges.push(edges.find(e => e.source === caminho[i] && e.target === caminho[i + 1]));
+                }
+
+                function acenderNo(no, dur) {
+                    nodeSel.filter(d => d === no).interrupt()
+                        .transition().duration(dur).ease(d3.easeBackOut)
+                        .attr('fill', PRIMARY).attr('r', d => d.layer === 0 ? 24 : 19)
+                        .style('filter', `drop-shadow(0 0 10px ${PRIMARY})`);
+                }
+
+                function passo(i) {
+                    if (myGen !== window.__neuralGen) return;
+
+                    if (i === 0) {
+                        acenderNo(caminho[0], 300);
+                        window.__neuralTimer = setTimeout(() => passo(1), 550);
+                        return;
+                    }
+
+                    if (i > trechoEdges.length) {
+                        // fim da trilha: sorteia um caminho novo, igual ao botão Replay
+                        window.__neuralTimer = setTimeout(() => {
+                            if (myGen !== window.__neuralGen) return;
+                            trilha.attr('opacity', 0);
+                            propagar();
+                        }, 1300);
+                        return;
+                    }
+
+                    const trecho = trechoEdges[i - 1];
+                    const origem = caminho[i - 1], destino = caminho[i];
+
+                    edgeSel.filter(d => d === trecho).interrupt()
+                        .transition().duration(180)
+                        .attr('opacity', 0.9).attr('stroke-width', 3.5);
+
+                    trilha.attr('cx', origem.x).attr('cy', origem.y).attr('opacity', 1)
+                        .transition().duration(520).ease(d3.easeCubicInOut)
+                        .attr('cx', destino.x).attr('cy', destino.y)
+                        .on('end', () => {
+                            if (myGen !== window.__neuralGen) return;
+                            acenderNo(destino, 220);
+                            window.__neuralTimer = setTimeout(() => passo(i + 1), 260);
+                        });
+                }
+                passo(0);
+            }
+            window.__neuralReplay = propagar;
+            document.getElementById('replay-neural').addEventListener('click', propagar);
+        })();
+
+        // ===== TOKENIZAÇÃO: digita, quebra em tokens, envia para a IA (loop) =====
+        (function () {
+            const ACCENT = cssVar('--mira-accent-2');
+            const svg = d3.select('#token-svg');
+            const TOKENS = [
+                { t: 'Como', sp: false }, { t: 'as', sp: true }, { t: 'LL', sp: true }, { t: 'Ms', sp: false },
+                { t: 'quebr', sp: true }, { t: 'am', sp: false }, { t: 'o', sp: true }, { t: 'texto', sp: true },
+                { t: 'em', sp: true }, { t: 'peda', sp: true }, { t: 'ços', sp: false }, { t: '?', sp: false }
+            ];
+            const N = TOKENS.length;
+
+            // editor de texto (bloco onde o prompt é digitado)
+            svg.append('rect').attr('x', 140).attr('y', 80).attr('width', 1000).attr('height', 100)
+                .attr('rx', 14).attr('fill', 'rgba(255,255,255,0.04)').attr('stroke', 'rgba(255,255,255,0.14)');
+            [0, 1, 2].forEach(i => {
+                svg.append('circle').attr('cx', 168 + i * 20).attr('cy', 104).attr('r', 5)
+                    .attr('fill', 'rgba(255,255,255,0.16)');
+            });
+
+            const textEl = svg.append('text').attr('x', 170).attr('y', 150)
+                .attr('font-family', 'monospace').attr('font-size', 24).attr('fill', 'rgba(255,255,255,0.92)');
+            const tspans = TOKENS.map(() => textEl.append('tspan'));
+            const cursor = svg.append('rect').attr('width', 3).attr('height', 30)
+                .attr('fill', PRIMARY).attr('opacity', 0);
+
+            // cérebro (a IA que recebe os tokens)
+            const bx = 640, by = 565;
+            const brainPath = `M ${bx - 78} ${by + 34} C ${bx - 100} ${by + 34} ${bx - 106} ${by - 16} ${bx - 78} ${by - 22}
+                C ${bx - 84} ${by - 58} ${bx - 44} ${by - 64} ${bx - 27} ${by - 42}
+                C ${bx - 16} ${by - 68} ${bx + 16} ${by - 68} ${bx + 27} ${by - 42}
+                C ${bx + 44} ${by - 64} ${bx + 84} ${by - 58} ${bx + 78} ${by - 22}
+                C ${bx + 106} ${by - 16} ${bx + 100} ${by + 34} ${bx + 78} ${by + 34}
+                C ${bx + 78} ${by + 50} ${bx + 44} ${by + 56} ${bx + 27} ${by + 40}
+                C ${bx + 12} ${by + 54} ${bx - 12} ${by + 54} ${bx - 27} ${by + 40}
+                C ${bx - 44} ${by + 56} ${bx - 78} ${by + 50} ${bx - 78} ${by + 34} Z`;
+            const brain = svg.append('path').attr('d', brainPath).attr('fill', PRIMARY).attr('opacity', 0.85);
+            svg.append('path').attr('d', `M ${bx} ${by - 60} C ${bx - 10} ${by - 20} ${bx + 10} ${by + 10} ${bx} ${by + 50}`)
+                .attr('fill', 'none').attr('stroke', 'rgba(10,18,32,0.55)').attr('stroke-width', 3);
+            const brainGlow = svg.append('path').attr('d', brainPath).attr('fill', 'none')
+                .attr('stroke', ACCENT).attr('stroke-width', 5).attr('opacity', 0);
+            svg.append('text').attr('x', bx).attr('y', by + 90).attr('text-anchor', 'middle')
+                .attr('fill', 'rgba(255,255,255,0.4)').attr('font-size', 13).attr('font-weight', 700)
+                .text('a IA recebe os tokens, um a um');
+
+            // caixas que vão quebrar o texto em tokens
+            const gRects = svg.append('g');
+            const rectSel = gRects.selectAll('rect').data(TOKENS).join('rect')
+                .attr('rx', 6).attr('fill', (d, i) => i % 2 === 0 ? PRIMARY : ACCENT).attr('opacity', 0);
+
+            // clone viajante: o token que é enviado para a IA
+            const clone = svg.append('g').attr('opacity', 0);
+            const cloneRect = clone.append('rect').attr('rx', 6);
+            const cloneText = clone.append('text').attr('text-anchor', 'middle').attr('dy', 5)
+                .attr('fill', '#0A1220').attr('font-size', 14).attr('font-weight', 700);
+
+            const GAP = 18; // respiro entre tokens quando o texto se separa
+
+            function limparTudo() {
+                tspans.forEach(ts => ts.interrupt().text('').attr('opacity', 1).attr('dx', 0));
+                cursor.attr('opacity', 0);
+                rectSel.interrupt().attr('opacity', 0);
+                clone.interrupt().attr('opacity', 0);
+                brainGlow.interrupt().attr('opacity', 0);
+                brain.interrupt().attr('opacity', 0.85).attr('transform', null);
+            }
+
+            function iniciarLoop() {
+                clearTimeout(window.__tokenTimer);
+                window.__tokenGen = (window.__tokenGen || 0) + 1;
+                const myGen = window.__tokenGen;
+                limparTudo();
+
+                function digitar(cb) {
+                    cursor.attr('opacity', 1);
+                    let ti = 0, ci = 0;
+                    function passo() {
+                        if (myGen !== window.__tokenGen) return;
+                        if (ti >= N) { cursor.attr('opacity', 0); cb(); return; }
+                        const full = (TOKENS[ti].sp ? ' ' : '') + TOKENS[ti].t;
+                        ci++;
+                        tspans[ti].text(full.slice(0, ci));
+                        const bb = textEl.node().getBBox();
+                        cursor.attr('x', bb.x + bb.width + 2).attr('y', bb.y - 2);
+                        if (ci >= full.length) { ti++; ci = 0; }
+                        window.__tokenTimer = setTimeout(passo, 42);
+                    }
+                    passo();
+                }
+
+                function quebrar(cb) {
+                    let i = 0;
+                    function marcar() {
+                        if (myGen !== window.__tokenGen) return;
+                        const bb = tspans[i].node().getBBox();
+                        d3.select(rectSel.nodes()[i])
+                            .attr('x', bb.x - 4).attr('y', bb.y - 6)
+                            .attr('width', bb.width + 8).attr('height', bb.height + 10)
+                            .attr('opacity', 0)
+                            .transition().duration(320).ease(d3.easeBackOut).attr('opacity', 0.32);
+                        window.__tokenTimer = setTimeout(() => { i++; passo(); }, 420);
+                    }
+                    function passo() {
+                        if (myGen !== window.__tokenGen) return;
+                        if (i >= N) { window.__tokenTimer = setTimeout(cb, 900); return; }
+                        if (i === 0) { marcar(); return; }
+                        // o token se afasta do anterior antes de ser marcado
+                        tspans[i].transition().duration(260).ease(d3.easeCubicOut)
+                            .attr('dx', GAP).on('end', marcar);
+                    }
+                    passo();
+                }
+
+                function enviar(cb) {
+                    let i = 0;
+                    function passo() {
+                        if (myGen !== window.__tokenGen) return;
+                        if (i >= N) { window.__tokenTimer = setTimeout(cb, 1200); return; }
+                        const r = rectSel.nodes()[i];
+                        const rb = r.getBBox();
+                        const cor = i % 2 === 0 ? PRIMARY : ACCENT;
+                        const startX = rb.x + rb.width / 2, startY = rb.y + rb.height / 2;
+
+                        cloneRect.attr('fill', cor).attr('width', rb.width).attr('height', rb.height)
+                            .attr('x', -rb.width / 2).attr('y', -rb.height / 2);
+                        cloneText.text(TOKENS[i].t);
+                        clone.attr('transform', `translate(${startX},${startY})`).attr('opacity', 1);
+
+                        d3.select(r).transition().duration(150).attr('opacity', 0.06);
+                        tspans[i].transition().duration(150).attr('opacity', 0.2);
+
+                        clone.transition().duration(420).ease(d3.easeCubicIn)
+                            .attrTween('transform', () => t => {
+                                const x = startX + (bx - startX) * t;
+                                const y = startY + (by - startY) * t;
+                                const s = 1 - 0.7 * t;
+                                return `translate(${x},${y}) scale(${s})`;
+                            })
+                            .on('end', () => {
+                                if (myGen !== window.__tokenGen) return;
+                                clone.attr('opacity', 0);
+                                brainGlow.attr('opacity', 0.9).transition().duration(260).attr('opacity', 0);
+                                brain.transition().duration(120)
+                                    .attr('transform', `translate(${bx},${by}) scale(1.06) translate(${-bx},${-by})`)
+                                    .transition().duration(180).attr('transform', null);
+                                window.__tokenTimer = setTimeout(() => { i++; passo(); }, 160);
+                            });
+                    }
+                    passo();
+                }
+
+                window.__tokenTimer = setTimeout(() => {
+                    digitar(() => quebrar(() => enviar(() => {
+                        window.__tokenTimer = setTimeout(() => {
+                            if (myGen === window.__tokenGen) iniciarLoop();
+                        }, 900);
+                    })));
+                }, 500);
+            }
+
+            window.__tokenReplay = iniciarLoop;
+            document.getElementById('replay-token').addEventListener('click', iniciarLoop);
+        })();
+
+        // ===== AUTOCOMPLETE: a LLM escolhe a palavra mais provável (loop) =====
+        (function () {
+            const svg = d3.select('#autocomplete-svg');
+            const DIM_FILL = 'rgba(255,255,255,0.05)';
+            const NEUTRAL = 'rgba(255,255,255,0.30)';
+
+            const PILLS = ['Qual', 'capital', 'do', 'Brasil'];
+            const PILL_Y = [150, 300, 450, 600];
+            const PILL_X = 545, PILL_R = 615;
+            const HID_X = 765, HID_Y = [120, 240, 360, 480, 600];
+            const OUT_X = 945;
+            const OUT = [
+                { w: 'Brasília', p: 94, y: 200, win: true },
+                { w: 'Buenos Aires', p: 4, y: 380, win: false },
+                { w: 'Lisboa', p: 2, y: 560, win: false }
+            ];
+            const BAR_X = 985, BAR_W = 190;
+
+            const gEdges = svg.append('g');
+            const gNodes = svg.append('g');
+            const gOut = svg.append('g');
+            const gCard = svg.append('g');
+            const gParticles = svg.append('g');
+
+            // ---- cartão do prompt (lado esquerdo) ----
+            const card = gCard.append('g').attr('opacity', 0);
+            card.append('rect').attr('x', 40).attr('y', 200).attr('width', 400).attr('height', 260).attr('rx', 18)
+                .attr('fill', 'rgba(255,255,255,0.04)').attr('stroke', 'rgba(255,255,255,0.14)');
+
+            // ícone flat: balão de fala (Google Material Symbols, Apache-2.0)
+            const gBubble = card.append('g').attr('transform', 'translate(80,246)');
+            gBubble.append('path').attr('fill', PRIMARY)
+                .attr('d', 'M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z')
+                .attr('transform', 'translate(-18,-18) scale(1.5)');
+            card.append('text').attr('x', 110).attr('y', 253).attr('font-size', 16)
+                .attr('fill', 'rgba(255,255,255,0.45)').attr('font-weight', 600).text('Você digita');
+
+            const L1 = ['Qual', 'é', 'a', 'capital'];
+            const L2 = ['do', 'Brasil?'];
+            const t1 = card.append('text').attr('x', 72).attr('y', 322).attr('font-size', 28)
+                .attr('font-weight', 600).attr('fill', 'rgba(255,255,255,0.94)');
+            const t2 = card.append('text').attr('x', 72).attr('y', 362).attr('font-size', 28)
+                .attr('font-weight', 600).attr('fill', 'rgba(255,255,255,0.94)');
+            const wordSpans = [];
+            L1.forEach((w, i) => wordSpans.push(t1.append('tspan').text((i ? ' ' : '') + w)));
+            L2.forEach((w, i) => wordSpans.push(t2.append('tspan').text((i ? ' ' : '') + w)));
+            // palavras que viram token: Qual, capital, do, Brasil?
+            const WORD_OF_PILL = [0, 3, 4, 5];
+
+            card.append('line').attr('x1', 72).attr('x2', 408).attr('y1', 388).attr('y2', 388)
+                .attr('stroke', 'rgba(255,255,255,0.10)');
+            card.append('text').attr('x', 72).attr('y', 408).attr('font-size', 12)
+                .attr('letter-spacing', 2).attr('fill', 'rgba(255,255,255,0.38)')
+                .text('PRÓXIMA PALAVRA MAIS PROVÁVEL');
+
+            const compG = card.append('g').attr('opacity', 0);
+            // ícone flat: brilho / auto_awesome (Google Material Symbols, Apache-2.0)
+            compG.append('g').attr('transform', 'translate(88,432)').append('path').attr('fill', PRIMARY)
+                .attr('d', 'M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z')
+                .attr('transform', 'translate(-14,-14) scale(1.15)');
+            const compText = compG.append('text').attr('x', 114).attr('y', 443).attr('font-size', 30)
+                .attr('font-weight', 800).attr('fill', PRIMARY).text('Brasília');
+            const cursor = card.append('rect').attr('x', 250).attr('y', 418).attr('width', 3).attr('height', 32)
+                .attr('fill', PRIMARY).attr('opacity', 0);
+
+            gCard.append('text').attr('x', 240).attr('y', 500).attr('text-anchor', 'middle')
+                .attr('font-size', 14).attr('fill', 'rgba(255,255,255,0.35)').text('o texto do usuário');
+
+            // ---- tokens (camada de entrada) ----
+            const pillSel = gNodes.selectAll('g.pill').data(PILLS).join('g').attr('class', 'pill')
+                .attr('transform', (d, i) => `translate(${PILL_X},${PILL_Y[i]})`).attr('opacity', 0);
+            pillSel.append('rect').attr('x', -70).attr('y', -23).attr('width', 140).attr('height', 46).attr('rx', 23)
+                .attr('fill', DIM_FILL).attr('stroke', PRIMARY).attr('stroke-opacity', 0.45);
+            pillSel.append('text').attr('text-anchor', 'middle').attr('dy', 7).attr('font-size', 19)
+                .attr('font-weight', 700).attr('fill', 'rgba(255,255,255,0.9)').text(d => d);
+
+            // ---- arestas ----
+            const edges = [];
+            PILL_Y.forEach((y1, i) => HID_Y.forEach((y2, j) => edges.push({ x1: PILL_R, y1, x2: HID_X, y2, i, j, layer: 0 })));
+            HID_Y.forEach((y1, j) => OUT.forEach((o, k) => edges.push({ x1: HID_X, y1, x2: OUT_X, y2: o.y, j, k, layer: 1 })));
+            const edgeSel = gEdges.selectAll('line').data(edges).join('line')
+                .attr('x1', d => d.x1).attr('y1', d => d.y1).attr('x2', d => d.x2).attr('y2', d => d.y2)
+                .attr('stroke', PRIMARY).attr('stroke-width', 1).attr('opacity', 0);
+
+            // ---- camada oculta ----
+            const hidSel = gNodes.selectAll('circle.hid').data(HID_Y).join('circle').attr('class', 'hid')
+                .attr('cx', HID_X).attr('cy', d => d).attr('r', 21)
+                .attr('fill', DIM_FILL).attr('stroke', NEUTRAL).attr('stroke-width', 2).attr('opacity', 0);
+
+            // ---- saída ----
+            const outSel = gNodes.selectAll('circle.out').data(OUT).join('circle').attr('class', 'out')
+                .attr('cx', OUT_X).attr('cy', d => d.y).attr('r', 27)
+                .attr('fill', DIM_FILL).attr('stroke', NEUTRAL).attr('stroke-width', 2).attr('opacity', 0);
+
+            const labelSel = gOut.selectAll('text.lab').data(OUT).join('text').attr('class', 'lab')
+                .attr('x', BAR_X).attr('y', d => d.y - 8).attr('font-size', 23).attr('font-weight', 800)
+                .attr('fill', 'rgba(255,255,255,0.9)').attr('opacity', 0).text(d => d.w);
+            gOut.selectAll('rect.barbg').data(OUT).join('rect').attr('class', 'barbg')
+                .attr('x', BAR_X).attr('y', d => d.y + 8).attr('width', BAR_W).attr('height', 12).attr('rx', 6)
+                .attr('fill', 'rgba(255,255,255,0.07)');
+            const barSel = gOut.selectAll('rect.bar').data(OUT).join('rect').attr('class', 'bar')
+                .attr('x', BAR_X).attr('y', d => d.y + 8).attr('width', 0).attr('height', 12).attr('rx', 6)
+                .attr('fill', d => d.win ? PRIMARY : 'rgba(255,255,255,0.32)');
+            const pctSel = gOut.selectAll('text.pct').data(OUT).join('text').attr('class', 'pct')
+                .attr('x', BAR_X + BAR_W + 12).attr('y', d => d.y + 20).attr('font-size', 20).attr('font-weight', 800)
+                .attr('fill', d => d.win ? PRIMARY : 'rgba(255,255,255,0.45)').attr('opacity', 0).text('0%');
+
+            const badge = gOut.append('g').attr('opacity', 0);
+            badge.append('rect').attr('x', 985).attr('y', 128).attr('width', 218).attr('height', 30).attr('rx', 15)
+                .attr('fill', 'rgba(77,163,255,0.14)').attr('stroke', PRIMARY).attr('stroke-opacity', 0.45);
+            badge.append('text').attr('x', 1094).attr('y', 148).attr('text-anchor', 'middle').attr('font-size', 15)
+                .attr('font-weight', 700).attr('fill', PRIMARY).text('maior probabilidade');
+
+            [[PILL_X, 'tokens do prompt'], [HID_X, 'camada oculta'], [1080, 'candidatos à próxima palavra']]
+                .forEach(([x, txt]) => {
+                    svg.append('text').attr('x', x).attr('y', 682).attr('text-anchor', 'middle')
+                        .attr('font-size', 14).attr('fill', 'rgba(255,255,255,0.32)').text(txt);
+                });
+
+            function halo(cx, cy, r0, r1) {
+                gParticles.append('circle').attr('cx', cx).attr('cy', cy).attr('r', r0)
+                    .attr('fill', 'none').attr('stroke', PRIMARY).attr('stroke-width', 3).attr('opacity', 0.55)
+                    .transition().duration(700).ease(d3.easeCubicOut)
+                    .attr('r', r1).attr('opacity', 0).remove();
+            }
+
+            function faisca(x1, y1, x2, y2, delay, dur, r) {
+                gParticles.append('circle').attr('cx', x1).attr('cy', y1).attr('r', r || 6)
+                    .attr('fill', '#fff').style('filter', `drop-shadow(0 0 8px ${PRIMARY})`).attr('opacity', 0)
+                    .transition().delay(delay).duration(0).attr('opacity', 0.95)
+                    .transition().duration(dur).ease(d3.easeCubicInOut).attr('cx', x2).attr('cy', y2)
+                    .transition().duration(120).attr('opacity', 0).remove();
+            }
+
+            function animar() {
+                clearTimeout(window.__acTimer);
+                clearInterval(window.__acCursor);
+                window.__acGen = (window.__acGen || 0) + 1;
+                const myGen = window.__acGen;
+
+                svg.selectAll('*').interrupt();
+                gParticles.selectAll('*').remove();
+
+                card.attr('opacity', 0);
+                gBubble.attr('transform', 'translate(80,246)');
+                wordSpans.forEach(s => s.attr('opacity', 0).attr('fill', 'rgba(255,255,255,0.94)'));
+                compG.attr('opacity', 0);
+                cursor.attr('opacity', 0);
+                pillSel.attr('opacity', 0).attr('transform', (d, i) => `translate(${PILL_X},${PILL_Y[i]}) scale(0.6)`);
+                edgeSel.attr('opacity', 0).attr('stroke-width', 1);
+                hidSel.attr('opacity', 0).attr('fill', DIM_FILL).attr('stroke', NEUTRAL).attr('r', 21).style('filter', null);
+                outSel.attr('opacity', 0).attr('fill', DIM_FILL).attr('stroke', NEUTRAL).attr('r', 27).style('filter', null);
+                labelSel.attr('opacity', 0).attr('fill', 'rgba(255,255,255,0.9)');
+                barSel.attr('width', 0);
+                pctSel.attr('opacity', 0).text('0%');
+                badge.attr('opacity', 0);
+
+                // 1. o cartão do prompt entra
+                card.transition().duration(400).attr('opacity', 1);
+
+                // 2. as palavras aparecem uma a uma
+                wordSpans.forEach((s, i) => s.transition().delay(350 + i * 160).duration(250).attr('opacity', 1));
+
+                // 3. cada palavra-token voa para a sua pílula
+                WORD_OF_PILL.forEach((wi, k) => {
+                    const t = 1600 + k * 480;
+                    wordSpans[wi].transition().delay(t).duration(200).attr('fill', PRIMARY);
+                    const bb = wordSpans[wi].node().getBBox();
+                    faisca(bb.x + bb.width / 2, bb.y + bb.height / 2, PILL_X, PILL_Y[k], t, 820);
+                    d3.select(pillSel.nodes()[k]).transition().delay(t + 820).duration(480)
+                        .ease(d3.easeBackOut.overshoot(1.6)).attr('opacity', 1)
+                        .attr('transform', `translate(${PILL_X},${PILL_Y[k]}) scale(1)`);
+                });
+
+                // 4. a rede se desenha
+                edgeSel.transition().delay(d => 4400 + d.layer * 260).duration(600).attr('opacity', 0.13);
+                hidSel.transition().delay((d, i) => 4500 + i * 110).duration(400)
+                    .ease(d3.easeBackOut.overshoot(1.4)).attr('opacity', 1);
+                outSel.transition().delay((d, i) => 4950 + i * 130).duration(400)
+                    .ease(d3.easeBackOut.overshoot(1.4)).attr('opacity', 1);
+                labelSel.transition().delay((d, i) => 5200 + i * 130).duration(400).attr('opacity', 1);
+
+                // 5. onda 1: tokens acendem a camada oculta
+                HID_Y.forEach((hy, j) => {
+                    const t = 5500 + j * 220;
+                    faisca(PILL_R, PILL_Y[j % 4], HID_X, hy, t, 760);
+                    d3.select(hidSel.nodes()[j]).transition().delay(t + 760).duration(380)
+                        .attr('fill', 'rgba(77,163,255,0.35)').attr('stroke', PRIMARY).attr('r', 24)
+                        .transition().duration(420).attr('r', 21);
+                });
+
+                // 6. onda 2: a camada oculta pontua os candidatos
+                OUT.forEach((o, k) => {
+                    const t = 7400 + k * 300;
+                    faisca(HID_X, HID_Y[k + 1], OUT_X, o.y, t, 760);
+                    d3.select(outSel.nodes()[k]).transition().delay(t + 760).duration(400)
+                        .attr('fill', o.win ? PRIMARY : 'rgba(255,255,255,0.10)')
+                        .attr('stroke', o.win ? PRIMARY : NEUTRAL);
+                });
+
+                // 7. as probabilidades crescem
+                barSel.transition().delay(9300).duration(1100).ease(d3.easeCubicOut)
+                    .attr('width', d => Math.max(6, BAR_W * d.p / 100));
+                pctSel.transition().delay(9300).duration(200).attr('opacity', 1)
+                    .transition().duration(1100)
+                    .tween('num', function (d) {
+                        const sel = d3.select(this), iv = d3.interpolateNumber(0, d.p);
+                        return t => sel.text(Math.round(iv(t)) + '%');
+                    });
+
+                // 8. Brasília vence: os outros apagam
+                outSel.filter(d => d.win).transition().delay(10600).duration(450)
+                    .ease(d3.easeBackOut.overshoot(1.8)).attr('r', 34)
+                    .style('filter', `drop-shadow(0 0 16px ${PRIMARY})`);
+                outSel.filter(d => !d.win).transition().delay(10600).duration(450).attr('opacity', 0.4);
+                labelSel.filter(d => d.win).transition().delay(10600).duration(450).attr('fill', PRIMARY);
+                labelSel.filter(d => !d.win).transition().delay(10600).duration(450).attr('fill', 'rgba(255,255,255,0.4)');
+                badge.transition().delay(10800).duration(500).attr('opacity', 1);
+
+                // 9. a palavra vencedora completa o texto do usuário
+                window.__acTimer = setTimeout(() => {
+                    if (myGen !== window.__acGen) return;
+                    escrever();
+                    compG.attr('opacity', 0).transition().delay(950).duration(350).attr('opacity', 1);
+                    setTimeout(() => {
+                        if (myGen !== window.__acGen) return;
+                        const bb = compText.node().getBBox();
+                        cursor.attr('x', bb.x + bb.width + 8).attr('opacity', 1);
+                        window.__acCursor = setInterval(() => {
+                            if (myGen !== window.__acGen) return clearInterval(window.__acCursor);
+                            cursor.attr('opacity', +cursor.attr('opacity') > 0.5 ? 0.05 : 1);
+                        }, 520);
+                        // fim: a rede fica em repouso até o Replay
+                    }, 1400);
+                }, 11300);
+
+                // cometa: a palavra vencedora viaja de volta para o cartão
+                function escrever() {
+                    if (myGen !== window.__acGen) return;
+                    const c = gParticles.append('circle').attr('r', 8).attr('fill', PRIMARY)
+                        .style('filter', `drop-shadow(0 0 12px ${PRIMARY})`).attr('opacity', 1);
+                    const P0 = [OUT_X, 200], C = [560, 30], P1 = [150, 434];
+                    c.transition().duration(950).ease(d3.easeCubicInOut)
+                        .tween('rota', () => t => {
+                            const u = 1 - t;
+                            c.attr('cx', u * u * P0[0] + 2 * u * t * C[0] + t * t * P1[0])
+                                .attr('cy', u * u * P0[1] + 2 * u * t * C[1] + t * t * P1[1]);
+                        })
+                        .on('end', () => {
+                            c.remove();
+                            if (myGen !== window.__acGen) return;
+                            halo(150, 434, 10, 46);
+                            gBubble.transition().duration(140).attr('transform', 'translate(80,246) scale(1.15)')
+                                .transition().duration(220).attr('transform', 'translate(80,246) scale(1)');
+                        });
+                }
+            }
+
+            window.__acReplay = animar;
+            document.getElementById('replay-autocomplete').addEventListener('click', animar);
+        })();
+
+        // ===== JANELA DE CONTEXTO: enche, comprime o antigo, descarta e continua (loop) =====
+        (function () {
+            const ACCENT = cssVar('--mira-accent-2');
+            const svg = d3.select('#ctx-svg');
+
+            const WX = 130, WY = 250, WW = 1020, WH = 210;   // moldura da janela
+            const PAD = 14, GAP = 5;
+            const CAP = WW - PAD * 2;                         // capacidade util em px
+            const BAR_Y = WY + PAD, BAR_H = WH - PAD * 2;
+            const LIMITE = 0.90;                              // quando dispara a compactacao
+
+            const corToken = d3.interpolateRgb('#123a5e', PRIMARY);
+
+            function animateCtx() {
+                clearTimeout(window.__ctxTimer);
+                window.__ctxGen = (window.__ctxGen || 0) + 1;
+                const myGen = window.__ctxGen;
+                svg.selectAll('*').remove();
+
+                // ---------- cenario fixo ----------
+                svg.append('text').attr('x', WX).attr('y', WY - 78)
+                    .attr('fill', 'rgba(255,255,255,0.85)').attr('font-size', 22).attr('font-weight', 700)
+                    .text('Janela de contexto da sessão');
+
+                const medidor = svg.append('text').attr('x', WX + WW).attr('y', WY - 78)
+                    .attr('text-anchor', 'end').attr('fill', PRIMARY)
+                    .attr('font-size', 22).attr('font-weight', 800).text('0%');
+
+                // barra de ocupacao
+                svg.append('rect').attr('x', WX).attr('y', WY - 56).attr('width', WW).attr('height', 10)
+                    .attr('rx', 5).attr('fill', 'rgba(255,255,255,0.08)');
+                const medBar = svg.append('rect').attr('x', WX).attr('y', WY - 56).attr('width', 0).attr('height', 10)
+                    .attr('rx', 5).attr('fill', PRIMARY);
+                svg.append('line')
+                    .attr('x1', WX + WW * LIMITE).attr('x2', WX + WW * LIMITE)
+                    .attr('y1', WY - 62).attr('y2', WY - 40)
+                    .attr('stroke', 'rgba(255,255,255,0.45)').attr('stroke-width', 2);
+
+                // moldura da janela
+                svg.append('rect').attr('x', WX).attr('y', WY).attr('width', WW).attr('height', WH)
+                    .attr('rx', 18).attr('fill', 'rgba(255,255,255,0.03)')
+                    .attr('stroke', 'rgba(255,255,255,0.20)').attr('stroke-width', 2);
+
+                svg.append('text').attr('x', WX + 4).attr('y', WY + WH + 34)
+                    .attr('fill', 'rgba(255,255,255,0.40)').attr('font-size', 17)
+                    .text('mais antigo');
+                svg.append('text').attr('x', WX + WW - 4).attr('y', WY + WH + 34)
+                    .attr('text-anchor', 'end').attr('fill', 'rgba(255,255,255,0.40)').attr('font-size', 17)
+                    .text('mais recente');
+
+                const gBars = svg.append('g');
+                const gAviso = svg.append('g').attr('opacity', 0);
+                gAviso.append('text').attr('x', WX + WW / 2).attr('y', WY + WH + 88)
+                    .attr('text-anchor', 'middle').attr('fill', ACCENT)
+                    .attr('font-size', 21).attr('font-weight', 700)
+                    .text('janela cheia: resumindo o histórico antigo');
+
+                // legenda
+                const leg = [
+                    { c: PRIMARY, t: 'trecho recente' },
+                    { c: '#123a5e', t: 'trecho antigo, já degradado' },
+                    { c: '#0b2a45', t: 'resumo comprimido', stroke: ACCENT }
+                ];
+                const gLeg = svg.append('g').attr('transform', `translate(${WX},${WY + WH + 128})`);
+                let lx = 0;
+                leg.forEach(l => {
+                    gLeg.append('rect').attr('x', lx).attr('y', -14).attr('width', 26).attr('height', 18)
+                        .attr('rx', 4).attr('fill', l.c)
+                        .attr('stroke', l.stroke || 'none').attr('stroke-width', 2)
+                        .attr('stroke-dasharray', l.stroke ? '4,3' : null);
+                    gLeg.append('text').attr('x', lx + 36).attr('y', 1)
+                        .attr('fill', 'rgba(255,255,255,0.55)').attr('font-size', 17).text(l.t);
+                    lx += 36 + l.t.length * 9.2 + 40;
+                });
+
+                // ---------- estado ----------
+                let itens = [];
+                let seq = 0;
+
+                const usado = () => d3.sum(itens, d => d.w) + Math.max(0, itens.length - 1) * GAP;
+
+                function posicionar() {
+                    let x = WX + PAD;
+                    itens.forEach((d, i) => {
+                        d.x = x;
+                        x += d.w + GAP;
+                        const idade = itens.length <= 1 ? 1 : i / (itens.length - 1);
+                        d.fill = d.kind === 'resumo' ? '#0b2a45' : corToken(0.18 + idade * 0.82);
+                    });
+                }
+
+                function medir(dur) {
+                    const p = Math.min(1, usado() / CAP);
+                    medBar.transition('med').duration(dur).ease(d3.easeQuadOut).attr('width', WW * p);
+                    medidor.text(Math.round(p * 100) + '%');
+                }
+
+                // transicoes nomeadas: 'layout' cuida de x/largura/cor, 'queda' cuida de y/altura.
+                // sem os nomes uma cancela a outra e o bloco trava no meio do caminho.
+                function desenhar(dur) {
+                    posicionar();
+                    const sel = gBars.selectAll('g.bloco').data(itens, d => d.id);
+                    sel.exit().remove();
+
+                    const ent = sel.enter().append('g').attr('class', 'bloco');
+                    // token novo cai de cima; o resumo nasce ja no lugar dos blocos que se fundiram
+                    ent.append('rect').attr('rx', 6)
+                        .attr('x', d => d.x).attr('width', d => d.w)
+                        .attr('y', d => d.kind === 'resumo' ? BAR_Y : BAR_Y - 190).attr('height', BAR_H)
+                        .attr('fill', d => d.fill).attr('opacity', 1);
+                    ent.append('text').attr('text-anchor', 'middle')
+                        .attr('fill', ACCENT).attr('font-size', 16).attr('font-weight', 700)
+                        .attr('y', BAR_Y + BAR_H / 2 + 6).attr('opacity', 0);
+
+                    const todos = ent.merge(sel);
+                    todos.select('rect')
+                        .attr('stroke', d => d.kind === 'resumo' ? ACCENT : 'none')
+                        .attr('stroke-width', 2)
+                        .attr('stroke-dasharray', d => d.kind === 'resumo' ? '5,4' : null)
+                        .transition('layout').duration(dur).ease(d3.easeQuadInOut)
+                        .attr('x', d => d.x).attr('width', d => d.w)
+                        .attr('fill', d => d.fill);
+                    todos.select('text').transition('layout').duration(dur)
+                        .attr('x', d => d.x + d.w / 2)
+                        .attr('opacity', d => (d.kind === 'resumo' && d.w > 78) ? 1 : 0)
+                        .text(d => d.kind === 'resumo' ? 'resumo' : '');
+
+                    medir(dur);
+                    return ent;
+                }
+
+                // ---------- 1) chega um trecho novo, cai de cima ----------
+                function adicionar() {
+                    if (myGen !== window.__ctxGen) return;
+
+                    if (usado() > CAP * LIMITE) { compactar(); return; }
+
+                    itens.push({ id: ++seq, w: 30 + Math.random() * 52, kind: 'token' });
+                    const ent = desenhar(300);
+
+                    // queda do bloco novo, com esmagamento leve na chegada
+                    ent.select('rect')
+                        .transition('queda').duration(300).ease(d3.easeQuadIn)
+                        .attr('y', BAR_Y + 10).attr('height', BAR_H - 10)
+                        .transition('queda').duration(170).ease(d3.easeBackOut.overshoot(1.6))
+                        .attr('y', BAR_Y).attr('height', BAR_H);
+
+                    window.__ctxTimer = setTimeout(adicionar, 500);
+                }
+
+                // ---------- 2) janela cheia: comprime o antigo e descarta parte ----------
+                function compactar() {
+                    if (myGen !== window.__ctxGen) return;
+
+                    // fatia mais antiga: primeiros blocos ate cobrir ~40% da janela
+                    const alvo = [];
+                    let acc = 0;
+                    for (const d of itens) {
+                        if (acc > CAP * 0.40 || d.kind === 'resumo' && alvo.length > 0) break;
+                        alvo.push(d); acc += d.w + GAP;
+                    }
+                    if (alvo.length < 3) { itens = itens.slice(1); desenhar(300); window.__ctxTimer = setTimeout(adicionar, 400); return; }
+
+                    const idsAlvo = new Set(alvo.map(d => d.id));
+                    const resto = itens.filter(d => !idsAlvo.has(d.id));
+
+                    // antecipacao: a fatia antiga pisca antes de qualquer coisa acontecer
+                    gAviso.transition('aviso').duration(220).attr('opacity', 1);
+                    gBars.selectAll('g.bloco').filter(d => idsAlvo.has(d.id)).select('rect')
+                        .attr('stroke-width', 2)
+                        .transition('destaque').duration(200).attr('stroke', 'rgba(255,255,255,0.85)')
+                        .transition('destaque').duration(200).attr('stroke', 'rgba(255,255,255,0.25)');
+
+                    // descarte: os trechos mais curtos da fatia caem para fora, o resumo nunca cai
+                    const candidatos = alvo.filter(d => d.kind !== 'resumo').sort((a, b) => a.w - b.w);
+                    const quantos = Math.min(candidatos.length, Math.max(1, Math.floor(alvo.length * 0.35)));
+                    const idsDesc = new Set(candidatos.slice(0, quantos).map(d => d.id));
+
+                    setTimeout(() => {
+                        if (myGen !== window.__ctxGen) return;
+                        gBars.selectAll('g.bloco').filter(d => idsDesc.has(d.id)).select('rect')
+                            .transition('queda').duration(60).attr('y', BAR_Y - 12)
+                            .transition('queda').duration(420).ease(d3.easeQuadIn)
+                            .attr('y', BAR_Y + 320).attr('opacity', 0);
+                    }, 420);
+
+                    // fusao: o que sobrou da fatia se comprime num unico bloco de resumo
+                    const mantidos = alvo.filter(d => !idsDesc.has(d.id));
+                    const somaMantidos = d3.sum(mantidos, d => d.w) + Math.max(0, mantidos.length - 1) * GAP;
+                    const larguraResumo = Math.max(56, somaMantidos * 0.34);
+                    const inicio = WX + PAD;
+
+                    setTimeout(() => {
+                        if (myGen !== window.__ctxGen) return;
+
+                        let cx = inicio;
+                        const destino = new Map();
+                        mantidos.forEach(d => {
+                            const w = d.w / somaMantidos * larguraResumo;
+                            destino.set(d.id, { x: cx, w });
+                            cx += w;
+                        });
+
+                        gBars.selectAll('g.bloco').filter(d => idsAlvo.has(d.id) && !idsDesc.has(d.id)).select('rect')
+                            .transition('layout').duration(560).ease(d3.easeQuadInOut)
+                            .attr('x', d => destino.get(d.id).x)
+                            .attr('width', d => destino.get(d.id).w)
+                            .attr('fill', '#0b2a45');
+
+                        // o resto desliza para a esquerda ocupando o espaço liberado
+                        const novoInicioResto = inicio + larguraResumo + GAP;
+                        const folga = resto.length ? resto[0].x - novoInicioResto : 0;
+                        gBars.selectAll('g.bloco').filter(d => !idsAlvo.has(d.id)).select('rect')
+                            .transition('layout').delay(140).duration(560).ease(d3.easeQuadInOut)
+                            .attr('x', d => d.x - folga);
+
+                        // troca o estado: a fatia antiga vira um unico bloco de resumo
+                        setTimeout(() => {
+                            if (myGen !== window.__ctxGen) return;
+                            itens = [{ id: ++seq, w: larguraResumo, kind: 'resumo' }, ...resto];
+                            desenhar(0);
+
+                            // leitura da consequencia antes de voltar a encher
+                            gBars.selectAll('g.bloco').filter(d => d.kind === 'resumo').select('rect')
+                                .transition('queda').duration(220).attr('y', BAR_Y - 6).attr('height', BAR_H + 12)
+                                .transition('queda').duration(260).attr('y', BAR_Y).attr('height', BAR_H);
+                            gAviso.transition('aviso').delay(320).duration(300).attr('opacity', 0);
+
+                            window.__ctxTimer = setTimeout(adicionar, 700);
+                        }, 720);
+                    }, 900);
+                }
+
+                window.__ctxTimer = setTimeout(adicionar, 500);
+            }
+
+            window.__ctxReplay = animateCtx;
+            document.getElementById('replay-ctx').addEventListener('click', animateCtx);
+        })();
+
+        // ===== COMANDO OBJETIVO: a serra corta o que está escrito (loop) =====
+        // Metáfora (marcenaria): ficha de pedido = prompt; cotas na tábua = objetivo e contexto;
+        // serra = execução literal do modelo, que não pergunta nem infere intenção; vão da parede =
+        // o que o usuário realmente queria. Ficha vaga: a serra corta assim mesmo, a peça sai fora
+        // da medida e não encaixa. Ficha com cotas: o corte cai na marca e a peça encaixa.
+        (function () {
+            const ACCENT = cssVar('--mira-accent-2');
+            const svg = d3.select('#corte-svg');
+
+            const T = { x: 100, y: 400, w: 480, h: 76 };          // tábua bruta na bancada
+            const VAO = { x: 830, y: 400, w: 300, h: 76 };        // vão que a peça precisa preencher
+            const SERRA_ALTO = T.y - 132;
+
+            // serra flat: lâmina com dentes + cabo
+            const serraD = (() => {
+                let d = 'M -86,-30 L 58,-30 L 58,0';
+                for (let x = 58; x > -86; x -= 12) d += ` L ${x - 6},10 L ${x - 12},0`;
+                return d + ' Z';
+            })();
+
+            function animateCorte() {
+                (window.__corteTimers || []).forEach(clearTimeout);
+                const timers = [];
+                window.__corteTimers = timers;
+                window.__corteGen = (window.__corteGen || 0) + 1;
+                const myGen = window.__corteGen;
+                svg.selectAll('*').remove();
+
+                const vivo = () => myGen === window.__corteGen;
+                const after = (ms, fn) => timers.push(setTimeout(() => { if (vivo()) fn(); }, ms));
+
+                // ---------- cenário fixo ----------
+                // parede com o vão de encaixe (o que o cliente quer)
+                const gVao = svg.append('g');
+                [VAO.x - 62, VAO.x + VAO.w].forEach(px => {
+                    gVao.append('rect').attr('x', px).attr('y', VAO.y - 118).attr('width', 62).attr('height', 250)
+                        .attr('rx', 6).attr('fill', 'rgba(255,255,255,0.06)')
+                        .attr('stroke', 'rgba(255,255,255,0.18)').attr('stroke-width', 2);
+                });
+                gVao.append('rect').attr('x', VAO.x).attr('y', VAO.y).attr('width', VAO.w).attr('height', VAO.h)
+                    .attr('rx', 6).attr('fill', 'none')
+                    .attr('stroke', 'rgba(255,255,255,0.30)').attr('stroke-width', 2).attr('stroke-dasharray', '6,6');
+                gVao.append('text').attr('x', VAO.x + VAO.w / 2).attr('y', VAO.y - 148).attr('text-anchor', 'middle')
+                    .attr('fill', 'rgba(255,255,255,0.55)').attr('font-size', 19).attr('font-weight', 700)
+                    .text('o encaixe que o cliente quer');
+
+                // bancada
+                svg.append('rect').attr('x', 60).attr('y', T.y + T.h + 8).attr('width', 560).attr('height', 14)
+                    .attr('rx', 7).attr('fill', 'rgba(255,255,255,0.14)');
+                svg.append('text').attr('x', 100).attr('y', T.y + T.h + 54)
+                    .attr('fill', 'rgba(255,255,255,0.38)').attr('font-size', 17)
+                    .text('a serra não pergunta, ela corta');
+
+                const gBancada = svg.append('g');
+                const gCotas = svg.append('g');
+                const gPeca = svg.append('g');
+                const gSerra = svg.append('g').attr('opacity', 0);
+                const gAvisos = svg.append('g');
+                const gFicha = svg.append('g');
+
+                gSerra.append('path').attr('d', serraD).attr('fill', 'rgba(255,255,255,0.85)');
+                gSerra.append('rect').attr('x', 58).attr('y', -36).attr('width', 54).attr('height', 44)
+                    .attr('rx', 10).attr('fill', ACCENT);
+
+                // trajetória em arco da peça até o vão
+                function arco(sel, from, to, dur, ease) {
+                    const cx = (from[0] + to[0]) / 2, cy = Math.min(from[1], to[1]) - 190;
+                    return sel.transition().duration(dur).ease(ease).attrTween('transform', () => t => {
+                        const m = 1 - t;
+                        const x = m * m * from[0] + 2 * m * t * cx + t * t * to[0];
+                        const y = m * m * from[1] + 2 * m * t * cy + t * t * to[1];
+                        return `translate(${x},${y})`;
+                    });
+                }
+
+                function ficha(preciso) {
+                    gFicha.selectAll('*').remove();
+                    const g = gFicha.append('g').attr('opacity', 0)
+                        .attr('transform', `translate(${T.x - 40},${140})`);
+                    g.append('rect').attr('width', 470).attr('height', preciso ? 176 : 96).attr('rx', 14)
+                        .attr('fill', 'rgba(255,255,255,0.05)')
+                        .attr('stroke', preciso ? PRIMARY : 'rgba(255,255,255,0.22)').attr('stroke-width', 2);
+                    g.append('text').attr('x', 26).attr('y', 40)
+                        .attr('fill', 'rgba(255,255,255,0.40)').attr('font-size', 15)
+                        .attr('letter-spacing', 3).text('PEDIDO');
+                    g.append('text').attr('x', 26).attr('y', 76)
+                        .attr('fill', 'rgba(255,255,255,0.92)').attr('font-size', 25).attr('font-weight', 700)
+                        .text(preciso ? 'prateleira do vão da sala' : 'faz uma prateleira');
+                    if (preciso) {
+                        ['largura: 300 mm', 'profundidade: 20 cm', 'carga: 5 kg'].forEach((t, i) => {
+                            g.append('text').attr('x', 26).attr('y', 112 + i * 26).attr('opacity', 0)
+                                .attr('fill', PRIMARY).attr('font-size', 19).text(t)
+                                .transition().delay(320 + i * 140).duration(260).attr('opacity', 1);
+                        });
+                    }
+                    g.transition().duration(460).ease(d3.easeCubicOut)
+                        .attr('opacity', 1).attr('transform', `translate(${T.x},${140})`);
+                    return g;
+                }
+
+                function ciclo(preciso) {
+                    if (!vivo()) return;
+                    gCotas.selectAll('*').remove();
+                    gAvisos.selectAll('*').remove();
+                    gPeca.selectAll('*').remove();
+                    gBancada.selectAll('*').remove();
+
+                    const cartao = ficha(preciso);
+
+                    // tábua bruta entra deslizando (corte do loop escondido fora do quadro)
+                    const tabua = gBancada.append('rect')
+                        .attr('x', T.x - 700).attr('y', T.y).attr('width', T.w).attr('height', T.h).attr('rx', 8)
+                        .attr('fill', 'rgba(255,255,255,0.08)')
+                        .attr('stroke', 'rgba(255,255,255,0.26)').attr('stroke-width', 2);
+                    tabua.transition().duration(520).ease(d3.easeCubicOut).attr('x', T.x);
+
+                    const cutW = preciso ? VAO.w : 170 + Math.round(Math.random() * 60);
+                    const cutX = T.x + cutW;
+
+                    // 2) só a ficha precisa traz a cota, e a cota se desenha sobre a tábua
+                    if (preciso) {
+                        const yc = T.y - 34;
+                        gCotas.append('line').attr('x1', T.x).attr('y1', yc).attr('x2', T.x).attr('y2', yc)
+                            .attr('stroke', PRIMARY).attr('stroke-width', 3)
+                            .transition().delay(700).duration(420).ease(d3.easeQuadInOut).attr('x2', cutX);
+                        [T.x, cutX].forEach((px, i) => {
+                            gCotas.append('line').attr('x1', px).attr('x2', px).attr('y1', yc - 12).attr('y2', yc + 12)
+                                .attr('stroke', PRIMARY).attr('stroke-width', 3).attr('opacity', 0)
+                                .transition().delay(700 + i * 420).duration(200).attr('opacity', 1);
+                        });
+                        gCotas.append('text').attr('x', (T.x + cutX) / 2).attr('y', yc - 20).attr('text-anchor', 'middle')
+                            .attr('fill', PRIMARY).attr('font-size', 21).attr('font-weight', 800).attr('opacity', 0)
+                            .text('300 mm')
+                            .transition().delay(1160).duration(240).attr('opacity', 1);
+                        gCotas.append('line').attr('x1', cutX).attr('x2', cutX)
+                            .attr('y1', T.y - 6).attr('y2', T.y + T.h + 6)
+                            .attr('stroke', PRIMARY).attr('stroke-width', 2).attr('stroke-dasharray', '6,6')
+                            .attr('opacity', 0).transition().delay(1200).duration(240).attr('opacity', 0.9);
+                    }
+
+                    const prep = preciso ? 1560 : 820;
+
+                    // 3) antecipação: a serra recua antes de descer
+                    after(prep, () => {
+                        gSerra.attr('transform', `translate(${cutX},${SERRA_ALTO})`)
+                            .transition().duration(200).attr('opacity', 1)
+                            .transition().duration(150).ease(d3.easeQuadOut)
+                            .attr('transform', `translate(${cutX},${SERRA_ALTO - 22})`)
+                            .transition().duration(280).ease(d3.easeQuadIn)
+                            .attr('transform', `translate(${cutX},${T.y + T.h - 6})`);
+                    });
+
+                    // 4) o corte acontece: a peça se separa, a serragem cai, a serra sobe
+                    after(prep + 640, () => {
+                        tabua.attr('x', cutX).attr('width', T.w - cutW);
+                        d3.range(5).forEach(i => {
+                            gBancada.append('rect')
+                                .attr('x', cutX - 4 + (i - 2) * 5).attr('y', T.y + T.h - 10)
+                                .attr('width', 5).attr('height', 5).attr('fill', 'rgba(255,255,255,0.5)')
+                                .transition().duration(360 + i * 40).ease(d3.easeQuadIn)
+                                .attr('y', T.y + T.h + 40).attr('opacity', 0).remove();
+                        });
+                        gSerra.transition().delay(160).duration(320).ease(d3.easeQuadOut)
+                            .attr('transform', `translate(${cutX},${SERRA_ALTO})`).attr('opacity', 0);
+
+                        const peca = gPeca.append('g').attr('transform', `translate(${T.x},${T.y})`);
+                        peca.append('rect').attr('width', cutW).attr('height', T.h).attr('rx', 8)
+                            .attr('fill', preciso ? PRIMARY : 'rgba(255,255,255,0.22)')
+                            .attr('stroke', preciso ? PRIMARY : 'rgba(255,255,255,0.35)').attr('stroke-width', 2);
+
+                        // 5) a peça viaja em arco até o vão
+                        after(260, () => {
+                            arco(peca, [T.x, T.y], [VAO.x, VAO.y], 760, d3.easeQuadInOut).on('end', () => {
+                                if (!vivo()) return;
+                                if (preciso) desfechoOk(peca); else desfechoErro(peca, cutW);
+                            });
+                        });
+                    });
+                }
+
+                // 6a) na medida: encaixa, assenta e brilha
+                function desfechoOk(peca) {
+                    peca.transition().duration(160).ease(d3.easeQuadOut)
+                        .attr('transform', `translate(${VAO.x},${VAO.y - 10})`)
+                        .transition().duration(240).ease(d3.easeCubicOut)
+                        .attr('transform', `translate(${VAO.x},${VAO.y})`);
+                    peca.select('rect').transition().delay(400).duration(300)
+                        .style('filter', `drop-shadow(0 0 26px ${PRIMARY})`);
+                    gAvisos.append('text').attr('x', VAO.x + VAO.w / 2).attr('y', VAO.y + VAO.h + 52)
+                        .attr('text-anchor', 'middle').attr('fill', PRIMARY)
+                        .attr('font-size', 24).attr('font-weight', 800).attr('opacity', 0)
+                        .text('encaixa de primeira')
+                        .transition().delay(420).duration(280).attr('opacity', 1);
+                    after(1500, () => ciclo(false));
+                }
+
+                // 6b) fora da medida: sobra vão, a peça treme e cai
+                function desfechoErro(peca, cutW) {
+                    const falta = VAO.w - cutW;
+                    gAvisos.append('rect').attr('x', VAO.x + cutW).attr('y', VAO.y)
+                        .attr('width', falta).attr('height', T.h)
+                        .attr('fill', 'rgba(255,255,255,0.05)')
+                        .attr('stroke', 'rgba(255,255,255,0.45)').attr('stroke-width', 2)
+                        .attr('stroke-dasharray', '5,5').attr('opacity', 0)
+                        .transition().delay(200).duration(240).attr('opacity', 1);
+                    gAvisos.append('text').attr('x', VAO.x + VAO.w / 2).attr('y', VAO.y + VAO.h + 52)
+                        .attr('text-anchor', 'middle').attr('fill', 'rgba(255,255,255,0.85)')
+                        .attr('font-size', 24).attr('font-weight', 800).attr('opacity', 0)
+                        .text('não encaixa')
+                        .transition().delay(260).duration(260).attr('opacity', 1);
+
+                    peca.transition().duration(110).ease(d3.easeSinInOut)
+                        .attr('transform', `translate(${VAO.x - 8},${VAO.y})`)
+                        .transition().duration(110).ease(d3.easeSinInOut)
+                        .attr('transform', `translate(${VAO.x + 6},${VAO.y})`)
+                        .transition().duration(110).ease(d3.easeSinInOut)
+                        .attr('transform', `translate(${VAO.x},${VAO.y})`);
+
+                    after(1100, () => {
+                        peca.transition().duration(520).ease(d3.easeQuadIn)
+                            .attr('transform', `translate(${VAO.x - 20},${VAO.y + 340})`)
+                            .style('opacity', 0);
+                    });
+                    after(1900, () => ciclo(true));
+                }
+
+                ciclo(false);
+            }
+
+            window.__corteReplay = animateCorte;
+            document.getElementById('replay-corte').addEventListener('click', animateCorte);
+        })();
+
+        // ===== ORÇAMENTO DA MENSAGEM: a máquina não retribui gentileza (loop) =====
+        // Metáfora (máquina automática de fichas): cada palavra do prompt é uma ficha gasta;
+        // a máquina = modelo, o painel = a leitura seca do que entrou, a mola = o esforço que
+        // entrega o item, o item = a resposta certa. Ficha de cortesia gasta orçamento e marca
+        // "+0": a mola não completa a volta e o item não cai. Devolvidas as fichas de cortesia,
+        // o mesmo orçamento vira instrução, a mola completa e o item cai na bandeja.
+        (function () {
+            const ACCENT = cssVar('--mira-accent-2');
+            const svg = d3.select('#fichas-svg');
+
+            const M = { x: 660, y: 70, w: 540, h: 540 };          // corpo da máquina
+            const VID = { x: 700, y: 130, w: 420, h: 250 };       // vitrine
+            const MOLA_Y = VID.y + 178;
+            const MOLA_X = VID.x + 30;
+            const MOLA_MAX = 300;                                  // curso total da mola
+            const BAND = { x: VID.x + 180, y: M.y + 400, w: 240, h: 80 };
+            const FILA_X = 90, FILA_Y = 330;
+            const FENDA_X = M.x - 6;
+            const ORC = { x: 90, y: 150, w: 470, h: 26 };
+            const CUSTO = 22;
+
+            const CORTESIA = ['por favor', 'se não for incômodo', 'muito obrigado'];
+            const INSTRUCAO = ['formato: tabela', 'máximo 5 linhas', 'em português'];
+
+            function molaPath(len) {
+                const n = 12, pts = [];
+                for (let i = 0; i <= n; i++) pts.push([MOLA_X + len * i / n, MOLA_Y + (i % 2 ? -16 : 16)]);
+                return d3.line().curve(d3.curveCatmullRom.alpha(0.6))(pts);
+            }
+
+            function animateFichas() {
+                (window.__fichasTimers || []).forEach(clearTimeout);
+                const timers = [];
+                window.__fichasTimers = timers;
+                window.__fichasGen = (window.__fichasGen || 0) + 1;
+                const myGen = window.__fichasGen;
+                svg.selectAll('*').remove();
+
+                const vivo = () => myGen === window.__fichasGen;
+                const after = (ms, fn) => timers.push(setTimeout(() => { if (vivo()) fn(); }, ms));
+
+                // ---------- cenário ----------
+                svg.append('text').attr('x', ORC.x).attr('y', ORC.y - 18)
+                    .attr('fill', 'rgba(255,255,255,0.55)').attr('font-size', 19).attr('font-weight', 700)
+                    .text('orçamento da mensagem');
+                svg.append('rect').attr('x', ORC.x).attr('y', ORC.y).attr('width', ORC.w).attr('height', ORC.h)
+                    .attr('rx', 13).attr('fill', 'rgba(255,255,255,0.07)');
+                const barra = svg.append('rect').attr('x', ORC.x).attr('y', ORC.y)
+                    .attr('width', ORC.w).attr('height', ORC.h).attr('rx', 13).attr('fill', PRIMARY);
+
+                // máquina
+                svg.append('rect').attr('x', M.x).attr('y', M.y).attr('width', M.w).attr('height', M.h)
+                    .attr('rx', 26).attr('fill', 'rgba(255,255,255,0.05)')
+                    .attr('stroke', 'rgba(255,255,255,0.22)').attr('stroke-width', 2);
+                svg.append('rect').attr('x', VID.x).attr('y', VID.y).attr('width', VID.w).attr('height', VID.h)
+                    .attr('rx', 14).attr('fill', 'rgba(255,255,255,0.03)')
+                    .attr('stroke', 'rgba(255,255,255,0.16)').attr('stroke-width', 2);
+                // fenda das fichas
+                svg.append('rect').attr('x', FENDA_X).attr('y', FILA_Y - 6).attr('width', 16).attr('height', 58)
+                    .attr('rx', 8).attr('fill', 'rgba(255,255,255,0.25)');
+                // bandeja de entrega
+                svg.append('rect').attr('x', BAND.x).attr('y', BAND.y).attr('width', BAND.w).attr('height', BAND.h)
+                    .attr('rx', 10).attr('fill', 'rgba(255,255,255,0.04)')
+                    .attr('stroke', 'rgba(255,255,255,0.20)').attr('stroke-width', 2);
+                svg.append('text').attr('x', BAND.x + BAND.w / 2).attr('y', BAND.y + BAND.h + 30)
+                    .attr('text-anchor', 'middle').attr('fill', 'rgba(255,255,255,0.38)').attr('font-size', 17)
+                    .text('entrega');
+                // calha de devolução
+                svg.append('rect').attr('x', M.x - 200).attr('y', 520).attr('width', 170).attr('height', 60)
+                    .attr('rx', 10).attr('fill', 'rgba(255,255,255,0.04)')
+                    .attr('stroke', 'rgba(255,255,255,0.18)').attr('stroke-width', 2);
+                svg.append('text').attr('x', M.x - 115).attr('y', 606).attr('text-anchor', 'middle')
+                    .attr('fill', 'rgba(255,255,255,0.38)').attr('font-size', 17).text('devolução');
+
+                // painel de leitura da máquina
+                svg.append('rect').attr('x', VID.x).attr('y', VID.y + VID.h + 26)
+                    .attr('width', VID.w).attr('height', 52).attr('rx', 10)
+                    .attr('fill', 'rgba(0,0,0,0.35)').attr('stroke', 'rgba(255,255,255,0.14)');
+                const painel = svg.append('text').attr('x', VID.x + 20).attr('y', VID.y + VID.h + 60)
+                    .attr('fill', 'rgba(255,255,255,0.75)').attr('font-size', 21).attr('font-weight', 700)
+                    .text('aguardando instrução');
+
+                const mola = svg.append('path').attr('d', molaPath(40)).attr('fill', 'none')
+                    .attr('stroke', 'rgba(255,255,255,0.45)').attr('stroke-width', 5).attr('stroke-linecap', 'round');
+
+                // item = a resposta certa, empurrada pela mola
+                const caixa = svg.append('g').attr('transform', `translate(${MOLA_X + 40},${MOLA_Y})`);
+                caixa.append('rect').attr('x', 0).attr('y', -38).attr('width', 76).attr('height', 76)
+                    .attr('rx', 10).attr('fill', PRIMARY);
+                caixa.append('rect').attr('x', 30).attr('y', -38).attr('width', 16).attr('height', 76)
+                    .attr('fill', 'rgba(0,0,0,0.30)');
+
+                const gFichas = svg.append('g');
+                const gFlut = svg.append('g');
+
+                let orcamento = ORC.w;
+
+                function ficha(texto, util, i) {
+                    const g = gFichas.append('g').attr('transform', `translate(${FILA_X},${FILA_Y + i * 0})`);
+                    g.append('rect').attr('width', 230).attr('height', 46).attr('rx', 23)
+                        .attr('fill', util ? 'rgba(77,163,255,0.18)' : 'rgba(255,255,255,0.07)')
+                        .attr('stroke', util ? PRIMARY : 'rgba(255,255,255,0.30)').attr('stroke-width', 2);
+                    g.append('text').attr('x', 115).attr('y', 30).attr('text-anchor', 'middle')
+                        .attr('fill', util ? PRIMARY : 'rgba(255,255,255,0.75)')
+                        .attr('font-size', 19).attr('font-weight', 700).text(texto);
+                    return g;
+                }
+
+                function consumir(util, x, y) {
+                    orcamento = Math.max(0, orcamento - ORC.w * 0.16);
+                    barra.transition().delay(150).duration(280).ease(d3.easeQuadOut).attr('width', orcamento);
+                    gFlut.append('text').attr('x', x).attr('y', y).attr('text-anchor', 'middle')
+                        .attr('fill', util ? PRIMARY : 'rgba(255,255,255,0.55)')
+                        .attr('font-size', util ? 24 : 22).attr('font-weight', 800)
+                        .text(util ? '+1 precisão' : '+0')
+                        .transition().duration(1200).ease(d3.easeQuadOut)
+                        .attr('y', y - 70).attr('opacity', 0).remove();
+                }
+
+                // ---------- ciclo ----------
+                function ciclo() {
+                    if (!vivo()) return;
+                    gFichas.selectAll('*').remove();
+                    gFichas.interrupt().attr('opacity', 1);
+                    gFlut.selectAll('*').remove();
+                    orcamento = ORC.w;
+                    barra.attr('width', ORC.w);
+                    painel.attr('fill', 'rgba(255,255,255,0.75)').text('aguardando instrução');
+                    mola.attr('d', molaPath(40));
+                    caixa.attr('opacity', 1).attr('transform', `translate(${MOLA_X + 40},${MOLA_Y})`);
+
+                    const devolvidas = [];
+
+                    // 1) as fichas de cortesia entram na máquina, uma a uma, com pausa de leitura
+                    CORTESIA.forEach((txt, i) => {
+                        const g = ficha(txt, false, i).attr('opacity', 0);
+                        const t0 = 300 + i * 1500;
+                        after(t0, () => {
+                            g.attr('transform', `translate(${FILA_X},${FILA_Y})`)
+                                .transition().duration(300).attr('opacity', 1)
+                                .transition().delay(700).duration(900).ease(d3.easeCubicInOut)
+                                .attr('transform', `translate(${FENDA_X - 230},${FILA_Y})`)
+                                .transition().duration(220).attr('opacity', 0);
+                            after(1750, () => { consumir(false, FENDA_X - 90, FILA_Y - 20); devolvidas.push(txt); });
+                        });
+                    });
+
+                    // 2) a máquina tenta entregar com o que sobrou: a mola não completa a volta
+                    after(5600, () => {
+                        painel.text('lendo: 3 fichas, 0 instrução');
+                        mola.transition().duration(120).ease(d3.easeQuadOut).attr('d', molaPath(26));
+                        caixa.transition().delay(120).duration(120).attr('transform', `translate(${MOLA_X + 26},${MOLA_Y})`);
+                    });
+                    after(5950, () => {
+                        const parcial = 150;
+                        mola.transition().duration(720).ease(d3.easeQuadOut).attrTween('d', () => {
+                            const iL = d3.interpolateNumber(26, parcial);
+                            return t => molaPath(iL(t));
+                        });
+                        caixa.transition().duration(720).ease(d3.easeQuadOut)
+                            .attr('transform', `translate(${MOLA_X + parcial},${MOLA_Y})`)
+                            .transition().duration(140).ease(d3.easeSinInOut)
+                            .attr('transform', `translate(${MOLA_X + parcial - 8},${MOLA_Y})`)
+                            .transition().duration(140).ease(d3.easeSinInOut)
+                            .attr('transform', `translate(${MOLA_X + parcial},${MOLA_Y})`);
+                    });
+                    after(6850, () => painel.attr('fill', 'rgba(255,255,255,0.9)').text('sem instrução suficiente'));
+
+                    // 3) devolução: a cortesia volta pela calha e o orçamento é recuperado
+                    after(7900, () => {
+                        painel.text('cortesia devolvida');
+                        devolvidas.forEach((txt, i) => {
+                            after(i * 220, () => {
+                                const moeda = gFlut.append('circle').attr('cx', FENDA_X - 20).attr('cy', FILA_Y + 20)
+                                    .attr('r', 15).attr('fill', 'rgba(255,255,255,0.35)');
+                                moeda.transition().duration(460).ease(d3.easeQuadIn)
+                                    .attr('cx', M.x - 115).attr('cy', 545)
+                                    .transition().duration(140).ease(d3.easeQuadOut).attr('cy', 535)
+                                    .transition().duration(160).ease(d3.easeQuadIn).attr('cy', 548)
+                                    .transition().delay(600).duration(300).attr('opacity', 0).remove();
+                            });
+                        });
+                        barra.transition().delay(260).duration(560).ease(d3.easeCubicOut).attr('width', ORC.w);
+                        orcamento = ORC.w;
+                    });
+
+                    // 4) o mesmo orçamento agora entra como instrução
+                    INSTRUCAO.forEach((txt, i) => {
+                        const t0 = 9000 + i * 1400;
+                        after(t0, () => {
+                            const g = ficha(txt, true, i).attr('opacity', 0)
+                                .attr('transform', `translate(${FILA_X},${FILA_Y})`);
+                            g.transition().duration(280).attr('opacity', 1)
+                                .transition().delay(620).duration(820).ease(d3.easeCubicInOut)
+                                .attr('transform', `translate(${FENDA_X - 230},${FILA_Y})`)
+                                .transition().duration(200).attr('opacity', 0);
+                            after(1620, () => consumir(true, FENDA_X - 90, FILA_Y - 20));
+                        });
+                    });
+
+                    // 5) a mola completa a volta e o item cai na bandeja
+                    after(14000, () => {
+                        painel.attr('fill', PRIMARY).text('lendo: formato, limite, idioma');
+                        mola.transition().duration(140).ease(d3.easeQuadOut).attrTween('d', () => {
+                            const iL = d3.interpolateNumber(150, 132);
+                            return t => molaPath(iL(t));
+                        });
+                    });
+                    after(14300, () => {
+                        mola.transition().duration(820).ease(d3.easeQuadOut).attrTween('d', () => {
+                            const iL = d3.interpolateNumber(132, MOLA_MAX);
+                            return t => molaPath(iL(t));
+                        });
+                        caixa.transition().duration(820).ease(d3.easeQuadOut)
+                            .attr('transform', `translate(${MOLA_X + MOLA_MAX},${MOLA_Y})`)
+                            .transition().duration(420).ease(d3.easeQuadIn)
+                            .attr('transform', `translate(${BAND.x + 84},${BAND.y + 6})`)
+                            .transition().duration(120).ease(d3.easeQuadOut)
+                            .attr('transform', `translate(${BAND.x + 84},${BAND.y - 6})`)
+                            .transition().duration(160).ease(d3.easeQuadIn)
+                            .attr('transform', `translate(${BAND.x + 84},${BAND.y + 6})`);
+                    });
+                    after(15900, () => painel.attr('fill', PRIMARY).text('entregue: exatamente o pedido'));
+
+                    // 6) o item sai de quadro pela bandeja: corte do loop escondido
+                    after(16900, () => {
+                        caixa.transition().duration(420).ease(d3.easeQuadIn)
+                            .attr('transform', `translate(${BAND.x + 84},${BAND.y + 190})`).attr('opacity', 0);
+                        mola.transition().delay(200).duration(500).ease(d3.easeCubicInOut).attrTween('d', () => {
+                            const iL = d3.interpolateNumber(MOLA_MAX, 40);
+                            return t => molaPath(iL(t));
+                        });
+                        gFichas.transition().duration(300).attr('opacity', 0);
+                    });
+                    after(17800, ciclo);
+                }
+
+                ciclo();
+            }
+
+            window.__fichasReplay = animateFichas;
+            document.getElementById('replay-fichas').addEventListener('click', animateFichas);
+        })();
+
+        // ===== SLIDE 8: agente = modelo (LLM) + harness; o harness roteia o pedido =====
+        // Sem metáfora: diagrama literal. O pedido entra, o modelo lê, o harness varre as
+        // ferramentas disponíveis, escolhe sozinho a(s) certa(s), executa, devolve o resultado
+        // ao modelo e a resposta cai na bandeja. Cada volta usa um pedido e outra ferramenta.
+        (function () {
+            const svg = d3.select('#agente-svg');
+            const ACCENT = cssVar('--mira-accent-2');
+            const FRACO = 'rgba(255,255,255,0.28)';
+
+            const FRAME = { x: 70, y: 150, w: 560, h: 470 };
+            const LLM = { x: 110, y: 200, w: 480, h: 150 };
+            const HAR = { x: 110, y: 400, w: 480, h: 180 };
+            const TRAY = { x: 70, y: 646, w: 560, h: 56 };
+            const LANE_Y = 58, CHIP_W = 400, CHIP_H = 52;
+            const CARD = { x: 770, w: 440, h: 86, gap: 22, y0: 110 };
+
+            const TOOLS = [
+                { id: 'cmd', nome: 'Comandos no terminal' },
+                { id: 'arq', nome: 'Arquivos do computador' },
+                { id: 'skill', nome: 'Skills e instruções' },
+                { id: 'web', nome: 'Busca na internet' },
+                { id: 'api', nome: 'APIs e serviços (MCP)' }
+            ];
+            const cardY = i => CARD.y0 + i * (CARD.h + CARD.gap);
+            const cardCy = i => cardY(i) + CARD.h / 2;
+            const idx = id => TOOLS.findIndex(t => t.id === id);
+
+            const PEDIDOS = [
+                { texto: 'rode os testes deste projeto', usa: ['cmd'], saida: ['12 testes, 1 falhou'], resposta: 'falha em auth.spec.js' },
+                { texto: 'corrija o bug em auth.js', usa: ['arq', 'cmd'], saida: ['auth.js lido', 'testes verdes'], resposta: 'bug corrigido e testado' },
+                { texto: 'qual versão saiu ontem?', usa: ['web'], saida: ['release 4.2 de ontem'], resposta: 'versão 4.2, lançada ontem' },
+                { texto: 'gere o relatório do padrão', usa: ['skill', 'api'], saida: ['skill relatório', 'dados da API'], resposta: 'relatório no formato da empresa' }
+            ];
+
+            // ícones flat desenhados com primitivas (sem dependência externa)
+            function icone(g, id, cor) {
+                const b = g.append('g').attr('fill', cor);
+                if (id === 'cmd') {
+                    b.append('rect').attr('x', 0).attr('y', 2).attr('width', 24).attr('height', 20).attr('rx', 4);
+                    b.append('path').attr('d', 'M5,8 L10,12 L5,16').attr('fill', 'none')
+                        .attr('stroke', 'rgba(10,18,32,0.9)').attr('stroke-width', 2.4).attr('stroke-linecap', 'round');
+                    b.append('rect').attr('x', 12).attr('y', 15).attr('width', 7).attr('height', 2.4).attr('rx', 1.2)
+                        .attr('fill', 'rgba(10,18,32,0.9)');
+                } else if (id === 'arq') {
+                    b.append('path').attr('d', 'M4,2 h9 l7,7 v13 a1,1 0 0 1 -1,1 h-15 a1,1 0 0 1 -1,-1 v-19 a1,1 0 0 1 1,-1 z');
+                    b.append('path').attr('d', 'M13,2 l7,7 h-7 z').attr('fill', 'rgba(10,18,32,0.55)');
+                } else if (id === 'skill') {
+                    b.append('rect').attr('x', 3).attr('y', 2).attr('width', 18).attr('height', 20).attr('rx', 3);
+                    b.append('path').attr('d', 'M7,9 L9.5,11.5 L14,7').attr('fill', 'none')
+                        .attr('stroke', 'rgba(10,18,32,0.9)').attr('stroke-width', 2.2).attr('stroke-linecap', 'round');
+                    b.append('rect').attr('x', 7).attr('y', 15).attr('width', 10).attr('height', 2.2).attr('rx', 1.1)
+                        .attr('fill', 'rgba(10,18,32,0.9)');
+                } else if (id === 'web') {
+                    b.append('circle').attr('cx', 12).attr('cy', 12).attr('r', 10);
+                    b.append('ellipse').attr('cx', 12).attr('cy', 12).attr('rx', 4.6).attr('ry', 10)
+                        .attr('fill', 'none').attr('stroke', 'rgba(10,18,32,0.75)').attr('stroke-width', 1.8);
+                    b.append('rect').attr('x', 2).attr('y', 11).attr('width', 20).attr('height', 2)
+                        .attr('fill', 'rgba(10,18,32,0.75)');
+                } else {
+                    b.append('rect').attr('x', 6).attr('y', 8).attr('width', 12).attr('height', 13).attr('rx', 3);
+                    b.append('rect').attr('x', 8).attr('y', 2).attr('width', 2.6).attr('height', 6).attr('rx', 1.3);
+                    b.append('rect').attr('x', 13.4).attr('y', 2).attr('width', 2.6).attr('height', 6).attr('rx', 1.3);
+                }
+                return b;
+            }
+
+            function animateAgente() {
+                (window.__agenteTimers || []).forEach(clearTimeout);
+                const timers = [];
+                window.__agenteTimers = timers;
+                window.__agenteGen = (window.__agenteGen || 0) + 1;
+                const myGen = window.__agenteGen;
+                svg.selectAll('*').remove();
+
+                const vivo = () => myGen === window.__agenteGen;
+                const after = (ms, fn) => timers.push(setTimeout(() => { if (vivo()) fn(); }, ms));
+
+                // ---------- estrutura fixa: o agente e suas duas peças ----------
+                svg.append('rect').attr('x', FRAME.x).attr('y', FRAME.y).attr('width', FRAME.w).attr('height', FRAME.h)
+                    .attr('rx', 22).attr('fill', 'rgba(255,255,255,0.03)')
+                    .attr('stroke', 'rgba(255,255,255,0.16)').attr('stroke-width', 2).attr('stroke-dasharray', '6,6');
+                svg.append('text').attr('x', FRAME.x + FRAME.w / 2).attr('y', FRAME.y - 14).attr('text-anchor', 'middle')
+                    .attr('fill', 'rgba(255,255,255,0.55)').attr('font-size', 20).attr('font-weight', 700)
+                    .attr('letter-spacing', 2).text('AGENTE DE IA');
+
+                const caixaLLM = svg.append('rect').attr('x', LLM.x).attr('y', LLM.y).attr('width', LLM.w).attr('height', LLM.h)
+                    .attr('rx', 16).attr('fill', 'rgba(255,255,255,0.05)')
+                    .attr('stroke', 'rgba(255,255,255,0.22)').attr('stroke-width', 2);
+                svg.append('text').attr('x', LLM.x + 26).attr('y', LLM.y + 52)
+                    .attr('fill', '#ffffff').attr('font-size', 30).attr('font-weight', 800).text('Modelo (LLM)');
+                svg.append('text').attr('x', LLM.x + 26).attr('y', LLM.y + 92)
+                    .attr('fill', 'rgba(255,255,255,0.60)').attr('font-size', 21).text('entende o pedido e decide o passo');
+                const statusLLM = svg.append('text').attr('x', LLM.x + 26).attr('y', LLM.y + 126)
+                    .attr('fill', FRACO).attr('font-size', 20).attr('font-weight', 700).text('em espera');
+
+                const caixaHAR = svg.append('rect').attr('x', HAR.x).attr('y', HAR.y).attr('width', HAR.w).attr('height', HAR.h)
+                    .attr('rx', 16).attr('fill', 'rgba(255,255,255,0.05)')
+                    .attr('stroke', 'rgba(255,255,255,0.22)').attr('stroke-width', 2);
+                svg.append('text').attr('x', HAR.x + 26).attr('y', HAR.y + 52)
+                    .attr('fill', '#ffffff').attr('font-size', 30).attr('font-weight', 800).text('Harness');
+                svg.append('text').attr('x', HAR.x + 26).attr('y', HAR.y + 92)
+                    .attr('fill', 'rgba(255,255,255,0.60)').attr('font-size', 21).text('liga o modelo ao mundo real');
+                const statusHAR = svg.append('text').attr('x', HAR.x + 26).attr('y', HAR.y + 132)
+                    .attr('fill', FRACO).attr('font-size', 20).attr('font-weight', 700).text('em espera');
+
+                // via de mão dupla entre as duas peças
+                const eixoX = LLM.x + LLM.w / 2;
+                svg.append('rect').attr('x', eixoX - 3).attr('y', LLM.y + LLM.h).attr('width', 6).attr('height', HAR.y - (LLM.y + LLM.h))
+                    .attr('fill', 'rgba(255,255,255,0.12)');
+                const viaDesce = svg.append('rect').attr('x', eixoX - 3).attr('y', LLM.y + LLM.h).attr('width', 6).attr('height', 0)
+                    .attr('fill', PRIMARY);
+                const viaSobe = svg.append('rect').attr('x', eixoX - 3).attr('y', HAR.y).attr('width', 6).attr('height', 0)
+                    .attr('fill', ACCENT);
+
+                // bandeja de resposta
+                svg.append('rect').attr('x', TRAY.x).attr('y', TRAY.y).attr('width', TRAY.w).attr('height', TRAY.h)
+                    .attr('rx', 12).attr('fill', 'rgba(255,255,255,0.04)')
+                    .attr('stroke', 'rgba(255,255,255,0.18)').attr('stroke-width', 2);
+                svg.append('text').attr('x', TRAY.x + 16).attr('y', TRAY.y + 36)
+                    .attr('fill', 'rgba(255,255,255,0.35)').attr('font-size', 19).text('resposta');
+
+                // ---------- ferramentas disponíveis ao harness ----------
+                svg.append('text').attr('x', CARD.x).attr('y', CARD.y0 - 24)
+                    .attr('fill', 'rgba(255,255,255,0.45)').attr('font-size', 19).attr('font-weight', 700)
+                    .attr('letter-spacing', 2).text('O QUE O HARNESS PODE ACIONAR');
+
+                const cartoes = TOOLS.map((t, i) => {
+                    const g = svg.append('g');
+                    const base = g.append('rect').attr('x', CARD.x).attr('y', cardY(i))
+                        .attr('width', CARD.w).attr('height', CARD.h).attr('rx', 14)
+                        .attr('fill', 'rgba(255,255,255,0.04)')
+                        .attr('stroke', 'rgba(255,255,255,0.16)').attr('stroke-width', 2);
+                    const gi = g.append('g').attr('transform', `translate(${CARD.x + 22},${cardY(i) + 23}) scale(1.7)`);
+                    const ic = icone(gi, t.id, FRACO);
+                    const rot = g.append('text').attr('x', CARD.x + 84).attr('y', cardCy(i) - 2)
+                        .attr('fill', 'rgba(255,255,255,0.68)').attr('font-size', 23).attr('font-weight', 700)
+                        .text(t.nome);
+                    const saida = g.append('text').attr('x', CARD.x + 84).attr('y', cardCy(i) + 26)
+                        .attr('fill', ACCENT).attr('font-size', 19)
+                        .attr('font-weight', 700).attr('opacity', 0);
+                    return { base, ic, rot, saida, g };
+                });
+
+                const gFeixes = svg.append('g');
+                const gMovel = svg.append('g');
+
+                function apagarTudo() {
+                    cartoes.forEach(c => {
+                        c.base.interrupt().attr('fill', 'rgba(255,255,255,0.04)')
+                            .attr('stroke', 'rgba(255,255,255,0.16)').attr('stroke-width', 2);
+                        c.ic.interrupt().attr('fill', FRACO);
+                        c.rot.interrupt().attr('fill', 'rgba(255,255,255,0.68)');
+                        c.saida.interrupt().attr('opacity', 0);
+                    });
+                }
+
+                function acender(i, forte) {
+                    const c = cartoes[i];
+                    c.base.transition().duration(160).ease(d3.easeQuadOut)
+                        .attr('fill', forte ? 'rgba(77,163,255,0.16)' : 'rgba(255,255,255,0.07)')
+                        .attr('stroke', forte ? PRIMARY : 'rgba(255,255,255,0.30)')
+                        .attr('stroke-width', forte ? 3 : 2);
+                    c.ic.transition().duration(160).attr('fill', forte ? PRIMARY : 'rgba(255,255,255,0.45)');
+                    if (forte) c.rot.transition().duration(160).attr('fill', '#ffffff');
+                }
+
+                function esmaecer(i) {
+                    const c = cartoes[i];
+                    c.base.transition().duration(200)
+                        .attr('fill', 'rgba(255,255,255,0.04)').attr('stroke', 'rgba(255,255,255,0.16)').attr('stroke-width', 2);
+                    c.ic.transition().duration(200).attr('fill', FRACO);
+                }
+
+                function feixe(i) {
+                    const cy = cardCy(i);
+                    const p = gFeixes.append('path')
+                        .attr('d', `M${HAR.x + HAR.w},${HAR.y + 90} C ${HAR.x + HAR.w + 90},${HAR.y + 90} ${CARD.x - 90},${cy} ${CARD.x},${cy}`)
+                        .attr('fill', 'none').attr('stroke', PRIMARY).attr('stroke-width', 3).attr('stroke-linecap', 'round');
+                    const L = p.node().getTotalLength();
+                    p.attr('stroke-dasharray', L).attr('stroke-dashoffset', L)
+                        .transition().duration(420).ease(d3.easeQuadOut).attr('stroke-dashoffset', 0);
+                    return p;
+                }
+
+                function retorno(p, texto, atraso) {
+                    const node = p.node(), L = node.getTotalLength();
+                    const g = gMovel.append('g').attr('opacity', 0);
+                    const larg = 18 + texto.length * 11;
+                    g.append('rect').attr('x', -larg / 2).attr('y', -19).attr('width', larg).attr('height', 38).attr('rx', 19)
+                        .attr('fill', 'rgba(110,231,240,0.16)').attr('stroke', ACCENT).attr('stroke-width', 2);
+                    g.append('text').attr('text-anchor', 'middle').attr('y', 8)
+                        .attr('fill', ACCENT).attr('font-size', 19).attr('font-weight', 700).text(texto);
+                    g.transition().delay(atraso).duration(140).attr('opacity', 1)
+                        .transition().duration(620).ease(d3.easeQuadInOut).attrTween('transform', () => t => {
+                            const pt = node.getPointAtLength(L * (1 - t));
+                            return `translate(${pt.x},${pt.y})`;
+                        })
+                        .transition().duration(180).attr('opacity', 0).remove();
+                }
+
+                // ---------- um ciclo por pedido ----------
+                let volta = 0;
+
+                function ciclo() {
+                    if (!vivo()) return;
+                    const P = PEDIDOS[volta % PEDIDOS.length];
+                    volta++;
+
+                    gFeixes.selectAll('*').remove();
+                    gMovel.selectAll('*').remove();
+                    apagarTudo();
+                    statusLLM.attr('fill', FRACO).text('em espera');
+                    statusHAR.attr('fill', FRACO).text('em espera');
+                    viaDesce.attr('height', 0);
+                    viaSobe.attr('height', 0).attr('y', HAR.y);
+
+                    // 1) o pedido do usuário entra pela esquerda e FICA visível o ciclo inteiro
+                    function montarChip(alvo) {
+                        const g = alvo.append('g');
+                        g.append('rect').attr('width', CHIP_W).attr('height', CHIP_H).attr('rx', 26)
+                            .attr('fill', 'rgba(77,163,255,0.14)').attr('stroke', PRIMARY).attr('stroke-width', 2);
+                        g.append('text').attr('x', CHIP_W / 2).attr('y', 34).attr('text-anchor', 'middle')
+                            .attr('fill', '#ffffff').attr('font-size', 22).attr('font-weight', 700).text(P.texto);
+                        return g;
+                    }
+
+                    const pedido = montarChip(gMovel).attr('transform', `translate(${-CHIP_W - 40},${LANE_Y})`);
+                    pedido.transition().duration(520).ease(d3.easeCubicOut)
+                        .attr('transform', `translate(${LLM.x},${LANE_Y})`);
+                    const rotuloPedido = gMovel.append('text').attr('x', LLM.x + CHIP_W + 18).attr('y', LANE_Y + 34)
+                        .attr('fill', 'rgba(255,255,255,0.40)').attr('font-size', 19).attr('font-weight', 700)
+                        .attr('opacity', 0).text('em andamento');
+
+                    // 2) uma cópia do pedido desce para o modelo: o original segue na tela como referência
+                    after(760, () => {
+                        pedido.transition().duration(120).ease(d3.easeQuadIn)
+                            .attr('transform', `translate(${LLM.x},${LANE_Y - 10})`)
+                            .transition().duration(200).ease(d3.easeQuadOut)
+                            .attr('transform', `translate(${LLM.x},${LANE_Y})`);
+                        const eco = montarChip(gMovel).attr('transform', `translate(${LLM.x},${LANE_Y})`).attr('opacity', 0.85);
+                        eco.transition().delay(120).duration(420).ease(d3.easeCubicIn)
+                            .attr('transform', `translate(${LLM.x},${LLM.y + 12})`)
+                            .transition().duration(220).attr('opacity', 0).remove();
+                        rotuloPedido.transition().delay(420).duration(260).attr('opacity', 1);
+                    });
+                    after(1300, () => {
+                        caixaLLM.transition().duration(220).attr('stroke', PRIMARY).attr('stroke-width', 3)
+                            .attr('fill', 'rgba(77,163,255,0.10)');
+                        statusLLM.attr('fill', PRIMARY).text('leu o pedido, precisa de ferramenta');
+                    });
+
+                    // 3) o modelo passa a tarefa ao harness
+                    after(1900, () => {
+                        viaDesce.attr('height', 0).transition().duration(300).ease(d3.easeQuadIn)
+                            .attr('height', HAR.y - (LLM.y + LLM.h));
+                        caixaLLM.transition().delay(220).duration(260).attr('stroke', 'rgba(255,255,255,0.30)')
+                            .attr('stroke-width', 2).attr('fill', 'rgba(255,255,255,0.05)');
+                    });
+                    after(2260, () => {
+                        caixaHAR.transition().duration(220).attr('stroke', PRIMARY).attr('stroke-width', 3)
+                            .attr('fill', 'rgba(77,163,255,0.10)');
+                        statusHAR.attr('fill', PRIMARY).text('escolhendo o que acionar');
+                        viaDesce.transition().duration(200).attr('height', 0);
+                    });
+
+                    // 4) o harness varre as ferramentas e escolhe sozinho a certa
+                    TOOLS.forEach((t, i) => {
+                        after(2500 + i * 130, () => {
+                            acender(i, false);
+                            after(150, () => { if (!P.usa.includes(t.id)) esmaecer(i); });
+                        });
+                    });
+
+                    const alvos = P.usa.map(idx);
+                    const feixes = [];
+                    alvos.forEach((i, k) => {
+                        after(3300 + k * 300, () => {
+                            acender(i, true);
+                            feixes[k] = feixe(i);
+                        });
+                    });
+
+                    // 5) as ferramentas executam e devolvem resultado ao modelo
+                    const fimExec = 3900 + alvos.length * 300;
+                    alvos.forEach((i, k) => {
+                        after(fimExec + k * 260, () => {
+                            cartoes[i].saida.text(P.saida[k]).attr('opacity', 0)
+                                .transition().duration(240).attr('opacity', 1);
+                            cartoes[i].rot.transition().duration(240).attr('fill', 'rgba(255,255,255,0.45)');
+                        });
+                    });
+
+                    const inicioRetorno = fimExec + alvos.length * 260 + 420;
+                    alvos.forEach((i, k) => {
+                        after(inicioRetorno, () => { if (feixes[k]) retorno(feixes[k], P.saida[k], k * 220); });
+                    });
+
+                    after(inicioRetorno + 500, () => {
+                        statusHAR.attr('fill', 'rgba(255,255,255,0.60)').text('executou e devolveu o resultado');
+                        viaSobe.attr('y', HAR.y).attr('height', 0)
+                            .transition().duration(320).ease(d3.easeQuadOut)
+                            .attr('y', LLM.y + LLM.h).attr('height', HAR.y - (LLM.y + LLM.h));
+                    });
+
+                    // 6) o modelo monta a resposta e ela cai na bandeja
+                    const tResp = inicioRetorno + 1200;
+                    after(tResp, () => {
+                        viaSobe.transition().duration(240).attr('height', 0).attr('y', LLM.y + LLM.h);
+                        caixaHAR.transition().duration(240).attr('stroke', 'rgba(255,255,255,0.22)')
+                            .attr('stroke-width', 2).attr('fill', 'rgba(255,255,255,0.05)');
+                        caixaLLM.transition().duration(240).attr('stroke', PRIMARY).attr('stroke-width', 3)
+                            .attr('fill', 'rgba(77,163,255,0.10)');
+                        statusLLM.attr('fill', PRIMARY).text('respondendo com o resultado real');
+                    });
+                    after(tResp + 420, () => {
+                        const larg = 30 + P.resposta.length * 12;
+                        const r = gMovel.append('g').attr('transform', `translate(${LLM.x + 20},${LLM.y + LLM.h - 20})`).attr('opacity', 0);
+                        r.append('rect').attr('width', larg).attr('height', 44).attr('rx', 22)
+                            .attr('fill', PRIMARY);
+                        r.append('text').attr('x', larg / 2).attr('y', 29).attr('text-anchor', 'middle')
+                            .attr('fill', '#0A1220').attr('font-size', 21).attr('font-weight', 800).text(P.resposta);
+                        r.transition().duration(180).attr('opacity', 1)
+                            .transition().duration(560).ease(d3.easeQuadIn)
+                            .attr('transform', `translate(${TRAY.x + 130},${TRAY.y + 6})`)
+                            .transition().duration(140).ease(d3.easeQuadOut)
+                            .attr('transform', `translate(${TRAY.x + 130},${TRAY.y - 4})`)
+                            .transition().duration(160).ease(d3.easeQuadIn)
+                            .attr('transform', `translate(${TRAY.x + 130},${TRAY.y + 6})`);
+                        // 7) a resposta sai de quadro por baixo: corte do loop escondido
+                        r.transition().delay(1700).duration(460).ease(d3.easeQuadIn)
+                            .attr('transform', `translate(${TRAY.x + 130},${TRAY.y + 220})`).attr('opacity', 0).remove();
+                    });
+
+                    after(tResp + 420, () => {
+                        rotuloPedido.attr('fill', ACCENT).text('atendido');
+                    });
+
+                    after(tResp + 2400, () => {
+                        // o pedido só sai depois da resposta entregue, junto com o reset do ciclo
+                        pedido.transition().duration(420).ease(d3.easeCubicIn)
+                            .attr('transform', `translate(${LLM.x},${LANE_Y - 90})`).attr('opacity', 0).remove();
+                        rotuloPedido.transition().duration(300).attr('opacity', 0).remove();
+                        caixaLLM.transition().duration(300).attr('stroke', 'rgba(255,255,255,0.22)')
+                            .attr('stroke-width', 2).attr('fill', 'rgba(255,255,255,0.05)');
+                        gFeixes.selectAll('path').transition().duration(360).ease(d3.easeQuadIn)
+                            .attr('stroke-dashoffset', function () { return this.getTotalLength(); }).remove();
+                        alvos.forEach(i => {
+                            esmaecer(i);
+                            cartoes[i].rot.transition().duration(300).attr('fill', 'rgba(255,255,255,0.68)');
+                            cartoes[i].saida.transition().duration(300).attr('opacity', 0);
+                        });
+                    });
+
+                    after(tResp + 3100, ciclo);
+                }
+
+                ciclo();
+            }
+
+            window.__agenteReplay = animateAgente;
+            document.getElementById('replay-agente').addEventListener('click', animateAgente);
+        })();
+
+        // === GATILHO DE ANIMAÇÃO: reinicia a animação do slide sempre que ele entra na tela ===
+        (function setupAnimationTriggers() {
+            const stages = [
+                { id: 'capa-stage', key: '__capaReplay' },
+                { id: 'neural-stage', key: '__neuralReplay' },
+                { id: 'token-stage', key: '__tokenReplay' },
+                { id: 'autocomplete-stage', key: '__acReplay' },
+                { id: 'ctx-stage', key: '__ctxReplay' },
+                { id: 'corte-stage', key: '__corteReplay' },
+                { id: 'fichas-stage', key: '__fichasReplay' },
+                { id: 'agente-stage', key: '__agenteReplay' }
+            ].map(s => ({ el: document.getElementById(s.id), key: s.key }))
+             .filter(s => s.el);
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
+                    const stage = stages.find(s => s.el === entry.target);
+                    const fn = stage && window[stage.key];
+                    if (typeof fn === 'function') fn();
+                });
+            }, { threshold: 0.35 });
+
+            stages.forEach(s => observer.observe(s.el));
+        })();
+
+        // === CONTROLES DE SLIDE: navegação card-a-card (progresso + botão + teclado) ===
+        (function () {
+            const cardSections = Array.from(document.querySelectorAll('body > section'));
+            if (cardSections.length === 0) return;
+
+            const progress = document.getElementById('mira-progress');
+            const nextBtn = document.getElementById('mira-next');
+            const nextIcon = document.getElementById('mira-next-icon');
+
+            const atBottom = () =>
+                (window.scrollY + window.innerHeight) >= (document.documentElement.scrollHeight - 100);
+
+            function currentIndex() {
+                const y = window.scrollY + window.innerHeight * 0.3;
+                let idx = -1;
+                for (let i = 0; i < cardSections.length; i++) {
+                    if (cardSections[i].offsetTop <= y) idx = i;
+                }
+                return idx;
+            }
+
+            function goTo(i) {
+                const idx = Math.max(0, Math.min(cardSections.length - 1, i));
+                cardSections[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+
+            window.addEventListener('scroll', () => {
+                const docH = document.documentElement.scrollHeight - window.innerHeight;
+                progress.style.width = (docH > 0 ? (window.scrollY / docH) * 100 : 0) + '%';
+                nextBtn.classList.toggle('visible', window.scrollY > 300);
+                nextIcon.setAttribute('data-lucide', atBottom() ? 'chevron-up' : 'chevron-down');
+                lucide.createIcons();
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (atBottom()) { window.scrollTo({ top: 0, behavior: 'smooth' }); return; }
+                goTo(currentIndex() + 1);
+            });
+
+            document.addEventListener('keydown', (e) => {
+                if (['ArrowRight', 'ArrowDown', 'PageDown'].includes(e.key)) {
+                    e.preventDefault();
+                    goTo(currentIndex() + 1);
+                } else if (['ArrowLeft', 'ArrowUp', 'PageUp'].includes(e.key)) {
+                    e.preventDefault();
+                    const idx = currentIndex();
+                    if (idx <= 0) window.scrollTo({ top: 0, behavior: 'smooth' });
+                    else goTo(idx - 1);
+                } else if (e.key === 'Home') {
+                    e.preventDefault();
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else if (e.key === 'End') {
+                    e.preventDefault();
+                    goTo(cardSections.length - 1);
+                } else if (e.key.toLowerCase() === 'f') {
+                    if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+                    else document.exitFullscreen();
+                }
+            });
+        })();
+    </script>
+
+    <!-- Modo edição (reordenar slides): tecla E ou ?edit=1 -->
+    <script src="mira/mira-edit.js" defer></script>
+    <!-- Edição livre estilo Canva (mover/redimensionar/rotacionar/duplicar/excluir/texto): tecla E -->
+    <script src="mira/mira-edit-free.js" defer></script>
+    <!-- mira-draw (desenhar sobre o slide): tecla P ou ?draw=1 -->
+    <script src="mira/mira-draw.js" defer></script>
+</body>
+
+</html>
