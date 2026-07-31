@@ -371,7 +371,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
         <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
             <div class="text-center mb-2">
                 <h2 class="text-4xl md:text-5xl font-bold mb-2">
-                    Ler em fila ou <span class="primary-color italic">ver tudo</span>
+                    RNN - ler em fila ou <span class="primary-color italic">Transformer: ver tudo</span>
                 </h2>
                 <p class="text-white/60 italic text-lg md:text-xl">O RNN esquece o começo; o Transformer liga tudo de uma vez.</p>
             </div>
@@ -417,7 +417,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
         <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
             <div class="text-center mb-2">
                 <h2 class="text-4xl md:text-5xl font-bold mb-2">
-                    Como o texto vira <span class="primary-color italic">tokens</span>
+                    Conceito de <span class="primary-color italic">Tokens</span>
                 </h2>
                 <p class="text-white/60 italic text-lg md:text-xl">O prompt é fatiado em pedaços antes de entrar na rede.</p>
             </div>
@@ -531,7 +531,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
         <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
             <div class="text-center mb-2">
                 <h2 class="text-4xl md:text-5xl font-bold mb-2">
-                    Como a <span class="primary-color italic">janela de contexto</span> enche
+                    O que é <span class="primary-color italic">janela de contexto</span>?
                 </h2>
                 <p class="text-white/60 italic text-lg md:text-xl">Quando lota, o agente resume o antigo e descarta o resto.</p>
             </div>
@@ -588,7 +588,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
         <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
             <div class="text-center mb-2">
                 <h2 class="text-4xl md:text-5xl font-bold mb-2">
-                    A IA não <span class="primary-color italic">pergunta</span>, ela executa
+                    Como fazer a IA me <span class="primary-color italic">atender corretamente</span>?
                 </h2>
                 <p class="text-white/60 italic text-lg md:text-xl">Sem consciência e longe da AGI: quem dá a medida é você.</p>
             </div>
@@ -645,7 +645,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
         <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
             <div class="text-center mb-2">
                 <h2 class="text-4xl md:text-5xl font-bold mb-2">
-                    Gaste tokens com <span class="primary-color italic">instrução</span>, não cortesia
+                    Dica: gaste tokens com <span class="primary-color italic">instrução</span>, não cortesia
                 </h2>
                 <p class="text-white/60 italic text-lg md:text-xl">Ela não sente gratidão: "por favor" só ocupa a janela.</p>
             </div>
@@ -702,7 +702,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
         <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
             <div class="text-center mb-2">
                 <h2 class="text-4xl md:text-5xl font-bold mb-2">
-                    Agente é modelo mais <span class="primary-color italic">harness</span>
+                    <span class="term-gradient font-bold underline">Agente</span>: é o <span class="primary-color italic">modelo</span> mais o <span class="font-bold italic" style="color: var(--mira-crop);">harness</span>
                 </h2>
                 <p class="text-white/60 italic text-lg md:text-xl">O modelo entende o pedido; o harness age na sua máquina.</p>
             </div>
@@ -1775,6 +1775,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
 
             function animar() {
                 clearTimeout(window.__acTimer);
+                clearTimeout(window.__acAutoTimer);
                 clearInterval(window.__acCursor);
                 window.__acGen = (window.__acGen || 0) + 1;
                 const myGen = window.__acGen;
@@ -1871,7 +1872,10 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
                             if (myGen !== window.__acGen) return clearInterval(window.__acCursor);
                             cursor.attr('opacity', +cursor.attr('opacity') > 0.5 ? 0.05 : 1);
                         }, 520);
-                        // fim: a rede fica em repouso até o Replay
+                        // fim: repousa 5s e reinicia sozinha (Regra Zero)
+                        window.__acAutoTimer = setTimeout(() => {
+                            if (myGen === window.__acGen) animar();
+                        }, 5000);
                     }, 1400);
                 }, 11300);
 
