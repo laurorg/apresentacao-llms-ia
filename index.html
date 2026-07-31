@@ -835,7 +835,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
             d3.select(palco).selectAll('svg').remove();
             // fundo discreto: a capa é do título, a animação só acompanha
             const svg = d3.select(palco).append('svg')
-                .attr('viewBox', `0 0 ${W} ${H}`).attr('opacity', 0.34);
+                .attr('viewBox', `0 0 ${W} ${H}`).attr('opacity', 0.7);
 
             const MONO = 'ui-monospace, SFMono-Regular, Menlo, Consolas, monospace';
             const FS = Math.max(13, Math.min(20, W * 0.0134));
