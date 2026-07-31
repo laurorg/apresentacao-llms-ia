@@ -366,7 +366,53 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
         </div>
     </section>
 
-    <!-- ============ SLIDE 3: TOKENIZAÇÃO ============ -->
+    <!-- ============ SLIDE 3: RNN vs TRANSFORMER ============ -->
+    <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
+        <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
+            <div class="text-center mb-2">
+                <h2 class="text-4xl md:text-5xl font-bold mb-2">
+                    Ler em fila ou <span class="primary-color italic">ver tudo</span>
+                </h2>
+                <p class="text-white/60 italic text-lg md:text-xl">O RNN esquece o começo; o Transformer liga tudo de uma vez.</p>
+            </div>
+
+            <div class="glass-card rounded-2xl p-1 md:p-2">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-[#4DA3FF]/15 flex items-center justify-center">
+                            <i data-lucide="waypoints" class="w-5 h-5 primary-color"></i>
+                        </div>
+                        <div>
+                            <p class="text-white font-bold text-sm">Atenção: a virada do Transformer</p>
+                            <p class="text-white/50 text-xs italic">A lupa lê uma por vez; o mural olha para todas ao mesmo tempo.</p>
+                        </div>
+                    </div>
+                    <button id="replay-trf" class="replay-btn" type="button">
+                        <i data-lucide="rotate-cw" class="w-4 h-4"></i>
+                        Replay
+                    </button>
+                </div>
+
+                <!-- @MIRA:SIZE 3/10 -->
+                <div class="anim-stage" id="trf-stage">
+                    <svg id="trf-svg" viewBox="0 0 1280 720" preserveAspectRatio="xMidYMid meet"></svg>
+                </div>
+
+                <div class="border-t border-white/10 pt-1 mt-1 mb-1">
+                    <p class="text-xs uppercase tracking-[3px] text-white/40 text-center mb-1">O exemplo na prática</p>
+                    <p class="text-sm md:text-base text-white/65 text-center leading-snug px-2">
+                        Se na frase estiver escrito <span class="text-white/85">“O gato não subiu na árvore porque ele estava cansado”</span>,
+                        o Transformer conecta instantaneamente a palavra <span class="primary-color font-semibold">“ele”</span>
+                        à palavra <span class="primary-color font-semibold">“gato”</span>
+                        <span class="text-white/45">(e não à “árvore”)</span>,
+                        calculando em <span class="text-white/85 italic">milissegundos</span> qual palavra dá sentido à outra.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ============ SLIDE 4: TOKENIZAÇÃO ============ -->
     <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
         <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
             <div class="text-center mb-2">
@@ -423,7 +469,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
         </div>
     </section>
 
-    <!-- ============ SLIDE 4: LLM É UM AUTOCOMPLETE ============ -->
+    <!-- ============ SLIDE 5: LLM É UM AUTOCOMPLETE ============ -->
     <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
         <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
             <div class="text-center mb-2">
@@ -480,7 +526,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
         </div>
     </section>
 
-    <!-- ============ SLIDE 5: JANELA DE CONTEXTO ============ -->
+    <!-- ============ SLIDE 6: JANELA DE CONTEXTO ============ -->
     <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
         <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
             <div class="text-center mb-2">
@@ -537,7 +583,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
         </div>
     </section>
 
-    <!-- ============ SLIDE 6: COMANDO OBJETIVO (A IA NÃO TEM CONSCIÊNCIA) ============ -->
+    <!-- ============ SLIDE 7: COMANDO OBJETIVO (A IA NÃO TEM CONSCIÊNCIA) ============ -->
     <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
         <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
             <div class="text-center mb-2">
@@ -594,7 +640,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
         </div>
     </section>
 
-    <!-- ============ SLIDE 7: ORÇAMENTO DA MENSAGEM (CORTESIA NÃO PONTUA) ============ -->
+    <!-- ============ SLIDE 8: ORÇAMENTO DA MENSAGEM (CORTESIA NÃO PONTUA) ============ -->
     <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
         <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
             <div class="text-center mb-2">
@@ -651,7 +697,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
         </div>
     </section>
 
-    <!-- ============ SLIDE 8: ANATOMIA DE UM AGENTE (MODELO + HARNESS) ============ -->
+    <!-- ============ SLIDE 9: ANATOMIA DE UM AGENTE (MODELO + HARNESS) ============ -->
     <section class="min-h-screen flex flex-col items-center justify-center px-6 pt-3 pb-6">
         <div class="w-full max-w-6xl" data-aos="fade-up" data-aos-delay="100">
             <div class="text-center mb-2">
@@ -708,7 +754,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
         </div>
     </section>
 
-    <!-- ============ SLIDE 9: ENCERRAMENTO ============ -->
+    <!-- ============ SLIDE 10: ENCERRAMENTO ============ -->
     <section class="min-h-screen flex flex-col items-center justify-center relative overflow-hidden px-6">
         <div class="cta-breathe absolute inset-0 pointer-events-none"></div>
         <div class="relative z-10 text-center max-w-4xl" data-aos="zoom-in">
@@ -1076,6 +1122,348 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
             }
             window.__neuralReplay = propagar;
             document.getElementById('replay-neural').addEventListener('click', propagar);
+        })();
+
+        // ===== RNN vs TRANSFORMER: a lupa que esquece x o mural do detetive (loop) =====
+        // Metáfora: à esquerda alguém varre a frase com uma lupa, palavra por palavra, e o que
+        // ficou para trás vai apagando da memória; ao chegar em "ele" o referente "gato" já sumiu
+        // e a ligação erra em "árvore". À direita a página inteira é pregada num mural e todos os
+        // fios saem de "ele" ao mesmo tempo; o fio para "gato" engrossa e vence.
+        (function () {
+            const ACCENT = cssVar('--mira-accent-2');
+            const OK = cssVar('--mira-crop');
+            const BAD = '#E0715F';
+            const svg = d3.select('#trf-svg');
+
+            const ROWS = [['O', 'gato', 'não', 'subiu', 'na'], ['árvore', 'porque', 'ele', 'estava', 'cansado']];
+            const I_GATO = 1, I_ARVORE = 5, I_ELE = 7;   // índices na lista achatada
+            const CH = 44, GAP = 12, TOP = 214, ROW_H = 58;
+            const LX = 330, RX = 950;
+
+            const DIM_FILL = 'rgba(255,255,255,0.05)';
+            const DIM_STROKE = 'rgba(255,255,255,0.12)';
+            const LIT_FILL = 'rgba(77,163,255,0.18)';
+
+            let built = false;
+            let L = null, R = null, gLeft = null, gRight = null;
+
+            // --- construção do palco (uma vez, já com a fonte carregada) ---
+            function buildSide(cx, corPino) {
+                const g = svg.append('g');
+
+                g.append('rect').attr('x', cx - 290).attr('y', 170).attr('width', 580).attr('height', 300)
+                    .attr('rx', 16).attr('fill', 'rgba(255,255,255,0.03)').attr('stroke', 'rgba(255,255,255,0.10)')
+                    .attr('class', 'folha');
+
+                const chips = [];
+                const gChips = g.append('g');
+                ROWS.forEach((row, ri) => {
+                    const larguras = row.map(w => {
+                        const t = gChips.append('text').attr('opacity', 0)
+                            .attr('font-size', 19).attr('font-weight', 700).text(w);
+                        const len = t.node().getComputedTextLength();
+                        t.remove();
+                        return len + 26;
+                    });
+                    const total = d3.sum(larguras) + GAP * (row.length - 1);
+                    let x = cx - total / 2;
+                    row.forEach((word, ci) => {
+                        const w = larguras[ci], y = TOP + ri * ROW_H;
+                        const rect = gChips.append('rect').attr('x', x).attr('y', y)
+                            .attr('width', w).attr('height', CH).attr('rx', 9)
+                            .attr('fill', DIM_FILL).attr('stroke', DIM_STROKE);
+                        const txt = gChips.append('text').attr('x', x + w / 2).attr('y', y + 29)
+                            .attr('text-anchor', 'middle').attr('font-size', 19).attr('font-weight', 700)
+                            .attr('fill', 'rgba(255,255,255,0.85)').text(word);
+                        chips.push({ word, x, y, w, h: CH, rect, txt });
+                        x += w + GAP;
+                    });
+                });
+
+                const gArcs = g.append('g');
+                const pino = g.append('g').attr('opacity', 0);
+                pino.append('circle').attr('cx', cx).attr('cy', 178).attr('r', 10).attr('fill', corPino);
+                pino.append('circle').attr('cx', cx - 3).attr('cy', 175).attr('r', 3).attr('fill', 'rgba(255,255,255,0.6)');
+
+                const badge = g.append('g').attr('opacity', 0);
+                const badgeRect = badge.append('rect').attr('y', 500).attr('height', 46).attr('rx', 23);
+                const badgeTxt = badge.append('text').attr('x', cx).attr('y', 530)
+                    .attr('text-anchor', 'middle').attr('font-size', 20).attr('font-weight', 800);
+
+                const legenda = g.append('text').attr('x', cx).attr('y', 592).attr('text-anchor', 'middle')
+                    .attr('font-size', 17).attr('fill', 'rgba(255,255,255,0.62)').attr('opacity', 0);
+
+                return { g, cx, chips, gArcs, pino, badge, badgeRect, badgeTxt, legenda };
+            }
+
+            function cabecalho(cx, titulo, dica) {
+                svg.append('text').attr('x', cx).attr('y', 92).attr('text-anchor', 'middle')
+                    .attr('font-size', 27).attr('font-weight', 800).attr('fill', 'rgba(255,255,255,0.92)').text(titulo);
+                svg.append('text').attr('x', cx).attr('y', 126).attr('text-anchor', 'middle')
+                    .attr('font-size', 15).attr('fill', 'rgba(255,255,255,0.45)').text(dica);
+            }
+
+            function ensureBuilt() {
+                if (built) return;
+                built = true;
+                svg.append('line').attr('x1', 640).attr('x2', 640).attr('y1', 60).attr('y2', 620)
+                    .attr('stroke', 'rgba(255,255,255,0.10)').attr('stroke-dasharray', '6,8');
+                cabecalho(LX, 'Modelo antigo (RNN)', 'lê palavra por palavra, com uma lupa');
+                cabecalho(RX, 'Transformer', 'prega a página inteira no mural');
+                gLeft = buildSide(LX, 'rgba(255,255,255,0.35)');
+                gRight = buildSide(RX, PRIMARY);
+                L = gLeft; R = gRight;
+
+                // lupa: o ator do lado esquerdo
+                const lupa = gLeft.g.append('g').attr('opacity', 0);
+                lupa.append('circle').attr('r', 38).attr('fill', 'rgba(77,163,255,0.07)')
+                    .attr('stroke', PRIMARY).attr('stroke-width', 5);
+                lupa.append('line').attr('x1', 27).attr('y1', 27).attr('x2', 52).attr('y2', 52)
+                    .attr('stroke', PRIMARY).attr('stroke-width', 9).attr('stroke-linecap', 'round');
+                L.lupa = lupa;
+            }
+
+            // caminho em arco por baixo das palavras
+            function arco(a, b, mergulho) {
+                const x1 = a.x + a.w / 2, y1 = a.y + a.h;
+                const x2 = b.x + b.w / 2, y2 = b.y + b.h;
+                const my = Math.max(y1, y2) + mergulho;
+                return `M ${x1} ${y1} C ${x1} ${my} ${x2} ${my} ${x2} ${y2}`;
+            }
+
+            function desenhar(sel, dur, ease) {
+                const len = sel.node().getTotalLength();
+                return sel.attr('stroke-dasharray', len).attr('stroke-dashoffset', len)
+                    .transition().duration(dur).ease(ease || d3.easeCubicOut).attr('stroke-dashoffset', 0);
+            }
+
+            function acender(chip, cor, fill) {
+                chip.rect.interrupt().transition().duration(220).ease(d3.easeCubicOut)
+                    .attr('fill', fill).attr('stroke', cor).attr('stroke-width', 2);
+                chip.txt.interrupt().transition().duration(220).attr('opacity', 1).attr('fill', '#ffffff');
+            }
+
+            function apagar(chip, dur, alvo) {
+                chip.rect.interrupt().transition().duration(dur).ease(d3.easeCubicIn)
+                    .attr('fill', DIM_FILL).attr('stroke', DIM_STROKE).attr('stroke-width', 1).attr('opacity', alvo);
+                chip.txt.interrupt().transition().duration(dur).ease(d3.easeCubicIn).attr('opacity', alvo);
+            }
+
+            function resetLado(S) {
+                S.g.interrupt().attr('opacity', 1);
+                S.gArcs.selectAll('*').interrupt().remove();
+                S.chips.forEach(c => {
+                    c.rect.interrupt().attr('fill', DIM_FILL).attr('stroke', DIM_STROKE)
+                        .attr('stroke-width', 1).attr('opacity', 0.3);
+                    c.txt.interrupt().attr('opacity', 0.3).attr('fill', 'rgba(255,255,255,0.85)');
+                });
+                S.pino.interrupt().attr('opacity', 0);
+                S.badge.interrupt().attr('opacity', 0);
+                S.legenda.interrupt().attr('opacity', 0);
+                S.g.select('.folha').interrupt().attr('transform', null).attr('opacity', 1);
+            }
+
+            function mostrarBadge(S, texto, cor) {
+                S.badgeTxt.text(texto).attr('fill', cor);
+                const w = S.badgeTxt.node().getComputedTextLength() + 44;
+                S.badgeRect.attr('x', S.cx - w / 2).attr('width', w)
+                    .attr('fill', 'rgba(255,255,255,0.04)').attr('stroke', cor).attr('stroke-width', 2);
+                S.badge.attr('opacity', 0).transition().duration(260).ease(d3.easeBackOut).attr('opacity', 1);
+            }
+
+            function animateTrf() {
+                ensureBuilt();
+                (window.__trfTimers || []).forEach(clearTimeout);
+                window.__trfTimers = [];
+                window.__trfGen = (window.__trfGen || 0) + 1;
+                const myGen = window.__trfGen;
+                const espera = (ms, fn) => window.__trfTimers.push(setTimeout(() => {
+                    if (myGen === window.__trfGen) fn();
+                }, ms));
+
+                resetLado(L);
+                resetLado(R);
+                L.lupa.interrupt().attr('opacity', 0);
+                R.g.attr('opacity', 0.22);
+
+                const alvo = i => ({ x: L.chips[i].x + L.chips[i].w / 2, y: L.chips[i].y + CH / 2 });
+
+                // ATO 1: a lupa varre da esquerda para a direita e o que passou vai apagando
+                espera(350, () => {
+                    const p0 = alvo(0);
+                    L.lupa.attr('transform', `translate(${p0.x},${p0.y}) scale(0.65)`)
+                        .transition().duration(320).ease(d3.easeBackOut.overshoot(1.2))
+                        .attr('opacity', 1).attr('transform', `translate(${p0.x},${p0.y}) scale(1)`);
+
+                    let i = 0;
+                    function passo() {
+                        if (myGen !== window.__trfGen) return;
+                        acender(L.chips[i], PRIMARY, LIT_FILL);
+                        if (i > 0) apagar(L.chips[i - 1], 1500, 0.1);   // a memória do que ficou para trás vai sumindo
+                        if (i >= I_ELE) { espera(160, recuar); return; }
+                        i++;
+                        const p = alvo(i);
+                        espera(90, () => {
+                            L.lupa.transition().duration(210).ease(d3.easeCubicInOut)
+                                .attr('transform', `translate(${p.x},${p.y}) scale(1)`)
+                                .on('end', passo);
+                        });
+                    }
+                    espera(300, passo);
+                });
+
+                // ATO 2: antecipação, tentativa de achar "gato" na memória, e a ligação errada
+                function recuar() {
+                    const p = alvo(I_ELE);
+                    L.lupa.transition().duration(140).ease(d3.easeCubicOut)
+                        .attr('transform', `translate(${p.x - 16},${p.y - 4}) scale(1.06)`)
+                        .transition().duration(180).ease(d3.easeCubicIn)
+                        .attr('transform', `translate(${p.x},${p.y}) scale(1)`)
+                        .on('end', () => { if (myGen === window.__trfGen) tentativa(); });
+                }
+
+                function tentativa() {
+                    const t = L.gArcs.append('path')
+                        .attr('d', arco(L.chips[I_ELE], L.chips[I_GATO], 110))
+                        .attr('fill', 'none').attr('stroke', 'rgba(255,255,255,0.38)')
+                        .attr('stroke-width', 3).attr('stroke-linecap', 'round');
+                    const len = t.node().getTotalLength();
+                    t.attr('stroke-dasharray', `${len} ${len}`).attr('stroke-dashoffset', len)
+                        .transition().duration(430).ease(d3.easeCubicOut).attr('stroke-dashoffset', 0)
+                        .on('end', () => {
+                            if (myGen !== window.__trfGen) return;
+                            // "gato" já apagou: o fio pisca sem encontrar nada e se solta
+                            L.chips[I_GATO].rect.transition().duration(110).attr('opacity', 0.26)
+                                .transition().duration(110).attr('opacity', 0.08)
+                                .transition().duration(110).attr('opacity', 0.2)
+                                .transition().duration(140).attr('opacity', 0.08);
+                            t.transition().delay(420).duration(320).ease(d3.easeCubicIn)
+                                .attr('stroke-dashoffset', -len).attr('opacity', 0).remove();
+                            espera(880, erroFinal);
+                        });
+                }
+
+                function erroFinal() {
+                    const e = L.gArcs.append('path')
+                        .attr('d', arco(L.chips[I_ELE], L.chips[I_ARVORE], 96))
+                        .attr('fill', 'none').attr('stroke', BAD).attr('stroke-width', 5)
+                        .attr('stroke-linecap', 'round')
+                        .style('filter', 'drop-shadow(0 0 12px rgba(224,113,95,0.55))');
+                    desenhar(e, 340).on('end', () => {
+                        if (myGen !== window.__trfGen) return;
+                        acender(L.chips[I_ARVORE], BAD, 'rgba(224,113,95,0.18)');
+                        mostrarBadge(L, 'perdeu o contexto', BAD);
+                        L.legenda.text('a memória do começo já apagou')
+                            .transition().duration(300).attr('opacity', 1);
+
+                        // a lupa fica hesitando sobre "ele" enquanto o erro é lido
+                        const pe = alvo(I_ELE);
+                        espera(300, function hesitar() {
+                            if (myGen !== window.__trfGen) return;
+                            L.lupa.transition().duration(850).ease(d3.easeSineInOut)
+                                .attr('transform', `translate(${pe.x},${pe.y - 7}) scale(1)`)
+                                .transition().duration(850).ease(d3.easeSineInOut)
+                                .attr('transform', `translate(${pe.x},${pe.y + 3}) scale(1)`)
+                                .on('end', hesitar);
+                        });
+
+                        espera(3820, murar);   // segura o erro 3s a mais antes do Transformer entrar
+                    });
+                }
+
+                // ATO 3: o mural do detetive, a página inteira de uma vez
+                function murar() {
+                    L.g.transition().duration(420).attr('opacity', 0.4);
+                    R.g.transition().duration(320).attr('opacity', 1);
+
+                    R.pino.attr('opacity', 0).attr('transform', 'translate(0,-96)')
+                        .transition().duration(260).ease(d3.easeCubicIn)
+                        .attr('opacity', 1).attr('transform', 'translate(0,0)')
+                        .on('end', () => {
+                            if (myGen !== window.__trfGen) return;
+                            R.g.select('.folha')
+                                .attr('transform', `translate(${R.cx},320) scale(0.94) translate(${-R.cx},-320)`)
+                                .transition().duration(420).ease(d3.easeBackOut.overshoot(1.5))
+                                .attr('transform', null);
+                            // todas as palavras acendem juntas: nada é lido em fila aqui
+                            espera(140, () => {
+                                R.chips.forEach(c => acender(c, 'rgba(255,255,255,0.35)', 'rgba(255,255,255,0.10)'));
+                                espera(420, fios);
+                            });
+                        });
+                }
+
+                function fios() {
+                    const LIGACOES = [
+                        { i: I_GATO, w: 6, dip: 122 },
+                        { i: 3, w: 2.6, dip: 84 },
+                        { i: I_ARVORE, w: 3.2, dip: 60 },
+                        { i: 9, w: 2.2, dip: 42 },
+                        { i: 0, w: 1.8, dip: 148 }
+                    ];
+                    acender(R.chips[I_ELE], PRIMARY, LIT_FILL);
+
+                    const paths = LIGACOES.map(l => {
+                        const p = R.gArcs.append('path')
+                            .attr('d', arco(R.chips[I_ELE], R.chips[l.i], l.dip))
+                            .attr('fill', 'none').attr('stroke', ACCENT).attr('stroke-width', l.w)
+                            .attr('stroke-linecap', 'round').attr('opacity', 0.75);
+                        desenhar(p, 460);   // todos ao mesmo tempo, não em fila
+                        return { p, l };
+                    });
+
+                    espera(620, () => {
+                        paths.forEach(({ p, l }) => {
+                            if (l.i === I_GATO) {
+                                p.transition().duration(340).ease(d3.easeCubicOut)
+                                    .attr('stroke', OK).attr('stroke-width', 8).attr('opacity', 1)
+                                    .style('filter', 'drop-shadow(0 0 16px rgba(53,208,127,0.6))');
+                            } else {
+                                p.transition().duration(340).ease(d3.easeCubicIn)
+                                    .attr('stroke-width', 1).attr('opacity', 0.16);
+                            }
+                        });
+                        espera(240, () => {
+                            acender(R.chips[I_GATO], OK, 'rgba(53,208,127,0.20)');
+                            mostrarBadge(R, 'ligou em milissegundos', OK);
+                            R.legenda.text('a distância entre as palavras não custa nada')
+                                .transition().duration(300).attr('opacity', 1);
+
+                            // durante a pausa longa o fio vencedor respira, para o palco nunca congelar
+                            const vencedor = paths.find(x => x.l.i === I_GATO).p;
+                            espera(300, function respirar() {
+                                if (myGen !== window.__trfGen) return;
+                                vencedor.transition().duration(950).ease(d3.easeSineInOut)
+                                    .style('filter', 'drop-shadow(0 0 28px rgba(53,208,127,0.85))')
+                                    .transition().duration(950).ease(d3.easeSineInOut)
+                                    .style('filter', 'drop-shadow(0 0 13px rgba(53,208,127,0.45))')
+                                    .on('end', respirar);
+                            });
+
+                            espera(6250, recolher);   // segura o desfecho 5s a mais antes de recolher
+                        });
+                    });
+                }
+
+                // ATO 4: recolhe os fios pela ponta e recomeça (corte escondido)
+                function recolher() {
+                    R.gArcs.selectAll('path').each(function () {
+                        const s = d3.select(this), len = this.getTotalLength();
+                        s.transition().duration(420).ease(d3.easeCubicIn).attr('stroke-dashoffset', len);
+                    });
+                    L.gArcs.selectAll('path').transition().duration(360).attr('opacity', 0);
+                    L.lupa.transition().delay(160).duration(320).attr('opacity', 0);
+                    [L, R].forEach(S => {
+                        S.badge.transition().duration(320).attr('opacity', 0);
+                        S.legenda.transition().duration(320).attr('opacity', 0);
+                        S.chips.forEach(c => apagar(c, 420, 0.3));
+                    });
+                    espera(700, animateTrf);
+                }
+            }
+
+            window.__trfReplay = animateTrf;
+            document.getElementById('replay-trf').addEventListener('click', animateTrf);
         })();
 
         // ===== TOKENIZAÇÃO: digita, quebra em tokens, envia para a IA (loop) =====
@@ -2220,7 +2608,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
             document.getElementById('replay-fichas').addEventListener('click', animateFichas);
         })();
 
-        // ===== SLIDE 8: agente = modelo (LLM) + harness; o harness roteia o pedido =====
+        // ===== SLIDE 9: agente = modelo (LLM) + harness; o harness roteia o pedido =====
         // Sem metáfora: diagrama literal. O pedido entra, o modelo lê, o harness varre as
         // ferramentas disponíveis, escolhe sozinho a(s) certa(s), executa, devolve o resultado
         // ao modelo e a resposta cai na bandeja. Cada volta usa um pedido e outra ferramenta.
@@ -2588,6 +2976,7 @@ img, svg, video, canvas, iframe, table, pre { max-width: 100%; }
             const stages = [
                 { id: 'capa-stage', key: '__capaReplay' },
                 { id: 'neural-stage', key: '__neuralReplay' },
+                { id: 'trf-stage', key: '__trfReplay' },
                 { id: 'token-stage', key: '__tokenReplay' },
                 { id: 'autocomplete-stage', key: '__acReplay' },
                 { id: 'ctx-stage', key: '__ctxReplay' },
